@@ -15,15 +15,7 @@ public class Monitor : MonoBehaviour
     
     #endregion
     
-    #region VARIABLES
-
-    private bool _playerIsInRange;
-    
-    #endregion
-    
-    
     #region MONOBEHAVIOUR
-
 
     private void Start()
     {
@@ -35,14 +27,12 @@ public class Monitor : MonoBehaviour
     {
         _nextCamera.Enable();
         _previousCamera.Enable();
-        _playerIsInRange = true;
     }
 
     private void OnTriggerExit(Collider other)
     {
         _nextCamera.Disable();
         _previousCamera.Disable();
-        _playerIsInRange = false;
     }
     
     #endregion
