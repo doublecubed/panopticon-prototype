@@ -5,10 +5,13 @@ using UnityEngine.UI;
 public class PlayerCameraPlacer : MonoBehaviour
 {
     #region REFERENCES
+
+    [Header("Prefabs")]
+    [SerializeField] private GameObject _cameraPrefab;
     
-    [SerializeField] private Camera _playerCam;
+    [Header("References")]
     [SerializeField] private Image _placementIndicator;
-    
+    private Camera _playerCam;
     
     #endregion
     
