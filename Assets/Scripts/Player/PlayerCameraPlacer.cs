@@ -13,6 +13,7 @@ public class PlayerCameraPlacer : MonoBehaviour
     
     [Header("References")]
     [SerializeField] private Image _placementIndicator;
+    [SerializeField] private CameraCentral _cameraCentral;
     private Camera _playerCam;
 
     // Input Action References
@@ -35,8 +36,13 @@ public class PlayerCameraPlacer : MonoBehaviour
     // Ghost camera spawning variables
     private bool _canSpawnGhost;
     private bool _ghostCameraSpawned;
+    private bool _canPlacePortable;
     private Vector3 _lastRaycastHitPosition;
     private float _ghostCameraOffset;
+
+    //TODO: Convert these from constant variables to another good practice.
+    private static readonly Vector3 GhostCameraColliderCenter = new Vector3(0f, 0.65f, 0f);
+    private static readonly Vector3 GhostCameraColliderSize = new Vector3(0.3f, 1.3f, 0.5f);
     
     #endregion
     
@@ -56,6 +62,7 @@ public class PlayerCameraPlacer : MonoBehaviour
     private void LateUpdate()
     {
         UpdateGhostCameraPosition();
+        CheckGhostCameraPlacement();
     }
     
     #endregion
@@ -108,17 +115,18 @@ public class PlayerCameraPlacer : MonoBehaviour
     
     private void PlaceKeyPressed(InputAction.CallbackContext obj)
     {
-        SpawnGhostCamera();
+        if (_ghostCameraSpawned) DespawnGhostCamera();
+        else SpawnGhostCamera();
     }
 
     private void FinalizeKeyPressed(InputAction.CallbackContext obj)
     {
-        Debug.Log("finalize key pressed");
+        PlacePortableCamera();
     }
     
     #endregion
     
-    #region GhostCamera Manipulation
+    #region Camera Manipulation
 
     private void SpawnGhostCamera()
     {
@@ -132,6 +140,13 @@ public class PlayerCameraPlacer : MonoBehaviour
             _ghostCameraOffset = (_ghostCameraInstance.position - transform.position).magnitude;
         }
     }
+
+    private void DespawnGhostCamera()
+    {
+        Destroy(_ghostCameraInstance.gameObject);
+        _ghostCameraInstance = null;
+        _ghostCameraSpawned = false;
+    }
     
     private void UpdateGhostCameraPosition()
     {
@@ -140,7 +155,43 @@ public class PlayerCameraPlacer : MonoBehaviour
         _ghostCameraInstance.position = transform.position + transform.forward * _ghostCameraOffset;
         _ghostCameraInstance.rotation = transform.rotation;
     }
-    
+
+    private void CheckGhostCameraPlacement()
+    {
+        if (_ghostCameraInstance == null) return;
+        
+        Collider[] overlapColliders = Physics.OverlapBox(_ghostCameraInstance.position + GhostCameraColliderCenter,
+            GhostCameraColliderSize * 0.45f, _ghostCameraInstance.rotation);
+
+        _canPlacePortable = GhostCameraIsGrounded() && overlapColliders.Length <= 0;
+        
+        _ghostCameraInstance.GetComponent<PortableCameraGhost>().RenderGhostCameraPlaceability(_canPlacePortable);
+    }
+
+    private bool GhostCameraIsGrounded()
+    {
+        Ray groundRay = new Ray(_ghostCameraInstance.position + Vector3.up * 0.1f, Vector3.down);
+        if (Physics.Raycast(groundRay, out RaycastHit hit, 0.2f))
+        {
+            return hit.collider.CompareTag("Ground");
+        }
+
+        return false;
+    }
+
+    private void PlacePortableCamera()
+    {
+        if (!_ghostCameraSpawned) return;
+        if (!_canPlacePortable) return;
+
+        Vector3 ghostPosition = _ghostCameraInstance.position;
+        Quaternion ghostRotation = _ghostCameraInstance.rotation;
+        
+        DespawnGhostCamera();
+        
+        GameObject portableCamera = Instantiate(_cameraPrefab, ghostPosition, ghostRotation);
+        _cameraCentral.AddCamera(portableCamera.GetComponent<PortableCamera>());
+    }
     
     #endregion
     

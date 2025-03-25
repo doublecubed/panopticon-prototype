@@ -24,5 +24,13 @@ public class PortableCamera : MonoBehaviour
     
     #endregion
     
+    #region METHODS
+
+    public void SetCameraPriority(int value)
+    {
+        _camera.depth = value;
+    }
+    
+    #endregion
     
 }

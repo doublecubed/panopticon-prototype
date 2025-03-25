@@ -12,12 +12,15 @@ public class PortableCameraGhost : MonoBehaviour
 
     [SerializeField] private List<MeshRenderer> _meshRenderers;
 
+    private Camera _ghostCam;
+    
     #endregion
 
     #region MONOBEHAVIOUR
 
     private void Awake()
     {
+        _ghostCam = GetComponentInChildren<Camera>();
         GetAllMeshRenderers();
         UpdateMeshRenderers(true);
     }
@@ -38,6 +41,12 @@ public class PortableCameraGhost : MonoBehaviour
             Material[] materials = Enumerable.Repeat(placeable ? _placeableMaterial : _notPlaceableMaterial, meshRenderer.materials.Length).ToArray();
             meshRenderer.materials = materials;
         }
+    }
+
+    public void RenderGhostCameraPlaceability(bool placeable)
+    {
+        UpdateMeshRenderers(placeable);
+        _ghostCam.enabled = placeable;
     }
     
     #endregion
