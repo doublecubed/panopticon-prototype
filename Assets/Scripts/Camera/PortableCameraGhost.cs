@@ -19,7 +19,7 @@ public class PortableCameraGhost : MonoBehaviour
     private void Awake()
     {
         GetAllMeshRenderers();
-        UpdateMeshRenderers(false);
+        UpdateMeshRenderers(true);
     }
 
     #endregion

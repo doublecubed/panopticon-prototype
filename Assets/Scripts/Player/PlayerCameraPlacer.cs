@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class PlayerCameraPlacer : MonoBehaviour
 {
@@ -8,10 +9,20 @@ public class PlayerCameraPlacer : MonoBehaviour
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _cameraPrefab;
+    [SerializeField] private GameObject _cameraGhostPrefab;
     
     [Header("References")]
     [SerializeField] private Image _placementIndicator;
     private Camera _playerCam;
+
+    // Input Action References
+    private InputAction _startPlacement;
+    private InputAction _finalizePlacement;
+    
+    // Camera ghost instance reference
+    private Transform _ghostCameraInstance;
+
+
     
     #endregion
     
@@ -20,6 +31,12 @@ public class PlayerCameraPlacer : MonoBehaviour
     [SerializeField] private float _maxPlacementDistance;
     
     private Vector3 _screenCenter;
+
+    // Ghost camera spawning variables
+    private bool _canSpawnGhost;
+    private bool _ghostCameraSpawned;
+    private Vector3 _lastRaycastHitPosition;
+    private float _ghostCameraOffset;
     
     #endregion
     
@@ -29,18 +46,23 @@ public class PlayerCameraPlacer : MonoBehaviour
     {
         _playerCam = Camera.main;
         CalculateScreenCenter();
-
+        SubscribeToInputs();
     }
-
     private void Update()
     {
         CastCameraRay();
+    }
+
+    private void LateUpdate()
+    {
+        UpdateGhostCameraPosition();
     }
     
     #endregion
     
     #region METHODS
 
+    #region Camera Raycast
     private void CalculateScreenCenter()
     {
         _screenCenter = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0);
@@ -51,14 +73,13 @@ public class PlayerCameraPlacer : MonoBehaviour
         Ray screenRay = _playerCam.ScreenPointToRay(_screenCenter);
         if (Physics.Raycast(screenRay, out RaycastHit hit))
         {
-            if (hit.collider.CompareTag("Ground") && RayHitDistance(hit.point) <= _maxPlacementDistance)
-            {
-                UpdatePlacementIndicator(true);
-            }
-            else
-            {
-                UpdatePlacementIndicator(false);
-            }
+            _lastRaycastHitPosition = hit.point;
+            _canSpawnGhost = hit.collider.CompareTag("Ground") && RayHitDistance(hit.point) <= _maxPlacementDistance; 
+            UpdatePlacementIndicator(_canSpawnGhost);
+        }
+        else
+        {
+            _lastRaycastHitPosition = transform.position + Vector3.up * (_maxPlacementDistance * 2);
         }
         
     }
@@ -72,6 +93,56 @@ public class PlayerCameraPlacer : MonoBehaviour
     {
         return Vector3.Distance(hitPoint, transform.position);
     }
+    #endregion
+    
+    #region Input
+
+    private void SubscribeToInputs()
+    {
+        _startPlacement = InputSystem.actions.FindAction("Interact");
+        _finalizePlacement = InputSystem.actions.FindAction("Attack");
+
+        _startPlacement.performed += PlaceKeyPressed;
+        _finalizePlacement.performed += FinalizeKeyPressed;
+    }
+    
+    private void PlaceKeyPressed(InputAction.CallbackContext obj)
+    {
+        SpawnGhostCamera();
+    }
+
+    private void FinalizeKeyPressed(InputAction.CallbackContext obj)
+    {
+        Debug.Log("finalize key pressed");
+    }
+    
+    #endregion
+    
+    #region GhostCamera Manipulation
+
+    private void SpawnGhostCamera()
+    {
+        if (_canSpawnGhost && !_ghostCameraSpawned)
+        {
+            _ghostCameraSpawned = true;
+            Vector3 projection = Vector3.ProjectOnPlane(_playerCam.transform.forward, Vector3.up);
+            GameObject cameraGhost = Instantiate(_cameraGhostPrefab, _lastRaycastHitPosition, Quaternion.LookRotation(projection));
+            _ghostCameraInstance = cameraGhost.transform;
+            
+            _ghostCameraOffset = (_ghostCameraInstance.position - transform.position).magnitude;
+        }
+    }
+    
+    private void UpdateGhostCameraPosition()
+    {
+        if (_ghostCameraInstance == null) return;
+        
+        _ghostCameraInstance.position = transform.position + transform.forward * _ghostCameraOffset;
+        _ghostCameraInstance.rotation = transform.rotation;
+    }
+    
+    
+    #endregion
     
     #endregion
 }
