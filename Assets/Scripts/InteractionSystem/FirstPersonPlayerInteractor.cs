@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;
@@ -9,6 +9,7 @@ namespace InteractionSystem
     {
         #region REFERENCES
 
+        private InputController _interactionControl;
         [SerializeField] private InputActionAsset _inputAsset;
         private InputAction _interact;
         private InputAction _interact2;
@@ -36,11 +37,7 @@ namespace InteractionSystem
 
         private void Start()
         {
-            InputActionMap map = _inputAsset.FindActionMap("Interaction");
-            _interact = map.FindAction("PrimaryInteract");
-            _interact.performed += Interact;
-            _interact2 = map.FindAction("SecondaryInteract");
-            _interact2.performed += SecondaryInteract;
+            ReceiveInputActions();
         }
         
         private void Update()
@@ -52,6 +49,16 @@ namespace InteractionSystem
         
         #region METHODS
 
+        private void ReceiveInputActions()
+        {
+            _interactionControl = InputController.Instance; 
+            List<InputAction> actions = _interactionControl.GetInteractionActions();
+            _interact = actions[0];
+            _interact.performed += Interact;
+            _interact2 = actions[1];
+            _interact2.performed += SecondaryInteract;
+        }
+        
         private void RaycastFromCamera()
         {
             Ray cameraRay = _playerCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
@@ -130,8 +137,11 @@ namespace InteractionSystem
 
         private void ToggleInput(InputAction action, bool toggle)
         {
-            if (toggle) action.Enable();
-            else action.Disable();
+            if (toggle) _interactionControl.EnableInteractionControl();
+            else _interactionControl.DisableInteractionControl();;
+
+            //if (toggle) action.Enable();
+            //else action.Disable();
         }
         
         #endregion

@@ -25,14 +25,16 @@ public class Monitor : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        _nextCamera.Enable();
-        _previousCamera.Enable();
+        InputController.Instance.EnableMonitorControl();
+        //_nextCamera.Enable();
+        //_previousCamera.Enable();
     }
 
     private void OnTriggerExit(Collider other)
     {
-        _nextCamera.Disable();
-        _previousCamera.Disable();
+        InputController.Instance.DisableMonitorControl();
+        //_nextCamera.Disable();
+        //_previousCamera.Disable();
     }
     
     #endregion
