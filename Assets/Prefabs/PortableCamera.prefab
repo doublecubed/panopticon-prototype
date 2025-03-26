@@ -605,6 +605,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cameraCradle: {fileID: 8056852393597891727}
+  _movementSpeed: 100
 --- !u!114 &8555901618628763148
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1489,7 +1489,7 @@ MonoBehaviour:
   _playerMovement: {fileID: -944628639613478452, guid: 4419d82f33d36e848b3ed5af4c8da37e, type: 3}
   _monitorControl: {fileID: -944628639613478452, guid: 9d81e9b69a746da46915bff6e95cf5e4, type: 3}
   _interactionControl: {fileID: -944628639613478452, guid: 3d811f52395573e46982cf0238893a65, type: 3}
-  _cameraMovementControl: {fileID: 0}
+  _cameraMovementControl: {fileID: -944628639613478452, guid: fd4e80d5da8974241929bc32402a37d2, type: 3}
   playerControl: 1
 --- !u!1 &1028513131
 GameObject:

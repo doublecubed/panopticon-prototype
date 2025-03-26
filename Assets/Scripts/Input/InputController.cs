@@ -18,20 +18,17 @@ public class InputController : MonoBehaviour, IInteractionInputControl
     
     private InputActionMap _interactionMap;
     private InputActionMap _monitorMap;
+
+    private InputActionMap _cameraMovementMap;
     
     private void Awake()
     {
         Instance = this;
         _interactionMap = _interactionControl.FindActionMap("Interaction");
         _monitorMap = _monitorControl.FindActionMap("CameraSwitch");
+        _cameraMovementMap = _cameraMovementControl.FindActionMap("CameraAngleMovement");
     }
-
-    private void Update()
-    {
-        if (playerControl) _playerMovement.Enable();
-        else _playerMovement.Disable();
-    }
-
+    
     public List<InputAction> GetInteractionActions()
     {
         List<InputAction> actions = new List<InputAction>();
@@ -58,5 +55,22 @@ public class InputController : MonoBehaviour, IInteractionInputControl
     public void DisableMonitorControl()
     {
         _monitorMap.Disable();
+    }
+
+    public InputAction GetCameraMovementAction()
+    {
+        return _cameraMovementMap.FindAction("MoveCamera");
+    }
+    
+    public void EnableCameraAngleControl()
+    {
+        _playerMovement.Disable();
+        _cameraMovementControl.Enable();
+    }
+
+    public void DisableCameraAngleControl()
+    {
+        _playerMovement.Enable();
+        _cameraMovementControl.Disable();
     }
 }
