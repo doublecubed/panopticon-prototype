@@ -73,4 +73,14 @@ public class InputController : MonoBehaviour, IInteractionInputControl
         _playerMovement.Enable();
         _cameraMovementControl.Disable();
     }
+
+    public void EnableCameraCanvasControl()
+    {
+        _playerMovement.Disable();
+    }
+
+    public void DisableCameraCanvasControl()
+    {
+        _playerMovement.Enable();
+    }
 }
