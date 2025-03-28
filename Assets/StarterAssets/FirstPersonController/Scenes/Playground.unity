@@ -706,7 +706,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 8400000, guid: a7580a3cb7cf1c7419435be27768b321, type: 2}
+  m_Texture: {fileID: 8400000, guid: 245c680bd30db85478be779099997a9d, type: 2}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -1486,6 +1486,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f3b2ea37dd3bd547b66c5ff7df8d4bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _globalAsset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   _playerMovement: {fileID: -944628639613478452, guid: 4419d82f33d36e848b3ed5af4c8da37e, type: 3}
   _monitorControl: {fileID: -944628639613478452, guid: 9d81e9b69a746da46915bff6e95cf5e4, type: 3}
   _interactionControl: {fileID: -944628639613478452, guid: 3d811f52395573e46982cf0238893a65, type: 3}
@@ -1786,6 +1787,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1984584464}
   - component: {fileID: 1984584463}
+  - component: {fileID: 1984584465}
   m_Layer: 0
   m_Name: CameraCentral
   m_TagString: Untagged
@@ -1821,6 +1823,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1984584465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1984584462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88b9616545a98c144b663822c8c9d6bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _renderTexture: {fileID: 8400000, guid: 245c680bd30db85478be779099997a9d, type: 2}
 --- !u!114 &2006620068 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8616685848737228376, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
@@ -2179,6 +2194,7 @@ MonoBehaviour:
   _cameraGhostPrefab: {fileID: 16140676964806466, guid: 7bf0bb5f0a07f0443b08bdf6d0cc12ca, type: 3}
   _placementIndicator: {fileID: 523673213}
   _cameraCentral: {fileID: 1984584463}
+  _cameraPreviewController: {fileID: 1984584465}
   _maxPlacementDistance: 3
 --- !u!114 &135756641613574985
 MonoBehaviour:

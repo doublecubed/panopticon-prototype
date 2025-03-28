@@ -14,6 +14,7 @@ public class PlayerCameraPlacer : MonoBehaviour
     [Header("References")]
     [SerializeField] private Image _placementIndicator;
     [SerializeField] private CameraCentral _cameraCentral;
+    [SerializeField] private CameraPreviewController _cameraPreviewController;
     private Camera _playerCam;
 
     // Input Action References

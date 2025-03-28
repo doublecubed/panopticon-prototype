@@ -7,7 +7,8 @@ using InteractionSystem;
 public class InputController : MonoBehaviour, IInteractionInputControl
 {
     public static InputController Instance;
-    
+
+    [SerializeField] private InputActionAsset _globalAsset;
     [SerializeField] private InputActionAsset _playerMovement;
     [SerializeField] private InputActionAsset _monitorControl;
     [SerializeField] private InputActionAsset _interactionControl;
@@ -18,7 +19,8 @@ public class InputController : MonoBehaviour, IInteractionInputControl
     
     private InputActionMap _interactionMap;
     private InputActionMap _monitorMap;
-
+    private InputActionMap _uiMap;
+    
     private InputActionMap _cameraMovementMap;
     
     private void Awake()
@@ -27,6 +29,8 @@ public class InputController : MonoBehaviour, IInteractionInputControl
         _interactionMap = _interactionControl.FindActionMap("Interaction");
         _monitorMap = _monitorControl.FindActionMap("CameraSwitch");
         _cameraMovementMap = _cameraMovementControl.FindActionMap("CameraAngleMovement");
+        _uiMap = InputSystem.actions.FindActionMap("UI");
+        
     }
     
     public List<InputAction> GetInteractionActions()
@@ -77,10 +81,16 @@ public class InputController : MonoBehaviour, IInteractionInputControl
     public void EnableCameraCanvasControl()
     {
         _playerMovement.Disable();
+        //_uiMap.Enable();
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void DisableCameraCanvasControl()
     {
         _playerMovement.Enable();
+        //_uiMap.Disable();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 }
