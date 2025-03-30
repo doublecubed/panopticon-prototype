@@ -8,7 +8,8 @@ public class CameraPower : MonoBehaviour
     [SerializeField] private MeshRenderer _bulb;
     [SerializeField] private Material _powerOnMaterial;
     [SerializeField] private Material _powerOffMaterial;
-    
+
+    private CameraModuleCanvas _moduleCanvas;
     private CameraModuleController _moduleController;
     private PortableCamera _portableCamera;
     
@@ -27,6 +28,7 @@ public class CameraPower : MonoBehaviour
     {
         _portableCamera = GetComponent<PortableCamera>();
         _moduleController = GetComponent<CameraModuleController>();
+        _moduleCanvas = GetComponent<CameraModuleCanvas>();
     }
 
     private void Start()
@@ -54,6 +56,13 @@ public class CameraPower : MonoBehaviour
         return _moduleController.Battery.CurrentCapacity;
     }
 
+    public void TogglePower()
+    {
+        if (IsTurnedOn) SwitchOff();
+        else SwitchOn();
+        _moduleCanvas.DressPowerButton();
+    }
+    
     public void SwitchOff()
     {
         IsTurnedOn = false;

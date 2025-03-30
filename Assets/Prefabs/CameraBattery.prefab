@@ -153,5 +153,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dd54e02bc2554d4f9fb49be566d32db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <MaxCapacity>k__BackingField: 200
-  <CurrentCapacity>k__BackingField: 200
+  <MaxCapacity>k__BackingField: 1000
+  <CurrentCapacity>k__BackingField: 1000
