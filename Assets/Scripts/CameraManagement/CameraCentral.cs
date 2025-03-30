@@ -6,6 +6,7 @@ public class CameraCentral : MonoBehaviour
 {
     #region REFERENCES
 
+    private CameraPreviewController _cameraPreviewController;
     [SerializeField] private List<PortableCamera> _portableCameras;
         
     #endregion
@@ -18,6 +19,11 @@ public class CameraCentral : MonoBehaviour
     
     #region MONOBEHAVIOUR
 
+    private void Awake()
+    {
+        _cameraPreviewController = GetComponent<CameraPreviewController>();
+    }
+
     private void Start()
     {
         _portableCameras = new List<PortableCamera>();
@@ -29,8 +35,9 @@ public class CameraCentral : MonoBehaviour
 
     public void AddCamera(PortableCamera portableCamera)
     {
+        portableCamera.SetCameraCentral(this);
         _portableCameras.Add(portableCamera);
-
+        
         if (_portableCameras.Count == 1)
         {
             portableCamera.SetCameraPriority(10);
@@ -74,6 +81,12 @@ public class CameraCentral : MonoBehaviour
             if (i == primaryIndex) _portableCameras[i].SetCameraPriority(10);
             else _portableCameras[i].SetCameraPriority(1);
         }
+    }
+
+    public void ToggleCameraPreview(Camera camera, bool enable)
+    {
+        if (enable) _cameraPreviewController.UpdateCameraPreview(camera);
+        else _cameraPreviewController.ResetCameraPreview();
     }
     
     #endregion

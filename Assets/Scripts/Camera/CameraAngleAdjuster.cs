@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 
 public class CameraAngleAdjuster : MonoBehaviour
 {
+    private PortableCamera _portableCamera;
     private CameraInteraction _interaction;
     [SerializeField] private Transform _cameraCradle;
     private InputController _inputController;
@@ -15,6 +16,7 @@ public class CameraAngleAdjuster : MonoBehaviour
 
     private void Awake()
     {
+        _portableCamera = GetComponent<PortableCamera>();
         _interaction = GetComponent<CameraInteraction>();
     }
 
@@ -39,10 +41,12 @@ public class CameraAngleAdjuster : MonoBehaviour
     public void Activate()
     {
         _inputController.EnableCameraAngleControl();
+        _portableCamera.EnableCameraPreview();
     }
 
     public void Deactivate()
     {
         _inputController.DisableCameraAngleControl();
+        _portableCamera.DisableCameraPreview();
     }
 }
