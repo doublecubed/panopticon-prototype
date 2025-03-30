@@ -46,14 +46,24 @@ public class CameraCentral : MonoBehaviour
 
     public void SwitchToNextCamera()
     {
-        _currentCameraIndex = (_currentCameraIndex + 1) % _portableCameras.Count;
+        bool flag = false;
+        while (!flag)
+        {
+            _currentCameraIndex = (_currentCameraIndex + 1) % _portableCameras.Count;
+            flag = _portableCameras[_currentCameraIndex].IsOn();
+        }
         SetCameraPriorities(_currentCameraIndex);
     }
 
     public void SwitchToPreviousCamera()
     {
-        _currentCameraIndex = (_currentCameraIndex - 1);
-        if (_currentCameraIndex < 0) _currentCameraIndex += _portableCameras.Count;
+        bool flag = false;
+        while (!flag)
+        {
+            _currentCameraIndex = (_currentCameraIndex - 1);
+            if (_currentCameraIndex < 0) _currentCameraIndex += _portableCameras.Count;
+            flag = _portableCameras[_currentCameraIndex].IsOn();
+        }
         SetCameraPriorities(_currentCameraIndex);
     }
 
