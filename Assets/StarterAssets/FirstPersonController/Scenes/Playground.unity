@@ -666,7 +666,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &408775419
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1835,6 +1835,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88b9616545a98c144b663822c8c9d6bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _renderTextureObject: {fileID: 408775418}
   _renderTexture: {fileID: 8400000, guid: 245c680bd30db85478be779099997a9d, type: 2}
 --- !u!114 &2006620068 stripped
 MonoBehaviour:

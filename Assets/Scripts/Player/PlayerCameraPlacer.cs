@@ -23,7 +23,7 @@ public class PlayerCameraPlacer : MonoBehaviour
     
     // Camera ghost instance reference
     private Transform _ghostCameraInstance;
-
+    private Camera _ghostCamera;
 
     
     #endregion
@@ -139,6 +139,9 @@ public class PlayerCameraPlacer : MonoBehaviour
             _ghostCameraInstance = cameraGhost.transform;
             
             _ghostCameraOffset = (_ghostCameraInstance.position - transform.position).magnitude;
+
+            _ghostCamera = _ghostCameraInstance.GetComponent<PortableCameraGhost>().GhostCam;
+            _cameraPreviewController.UpdateCameraPreview(_ghostCamera);
         }
     }
 
@@ -147,6 +150,7 @@ public class PlayerCameraPlacer : MonoBehaviour
         Destroy(_ghostCameraInstance.gameObject);
         _ghostCameraInstance = null;
         _ghostCameraSpawned = false;
+        _cameraPreviewController.ResetCameraPreview();
     }
     
     private void UpdateGhostCameraPosition()

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PortableCameraGhost : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class PortableCameraGhost : MonoBehaviour
 
     [SerializeField] private List<MeshRenderer> _meshRenderers;
 
-    private Camera _ghostCam;
+    public Camera GhostCam { get; private set; }
     
     #endregion
 
@@ -20,7 +21,7 @@ public class PortableCameraGhost : MonoBehaviour
 
     private void Awake()
     {
-        _ghostCam = GetComponentInChildren<Camera>();
+        GhostCam = GetComponentInChildren<Camera>();
         GetAllMeshRenderers();
         UpdateMeshRenderers(true);
     }
@@ -46,7 +47,7 @@ public class PortableCameraGhost : MonoBehaviour
     public void RenderGhostCameraPlaceability(bool placeable)
     {
         UpdateMeshRenderers(placeable);
-        _ghostCam.enabled = placeable;
+        GhostCam.enabled = placeable;
     }
     
     #endregion
