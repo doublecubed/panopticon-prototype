@@ -195,6 +195,7 @@ public class PlayerCameraPlacer : MonoBehaviour
         DespawnGhostCamera();
         
         GameObject portableCamera = Instantiate(_cameraPrefab, ghostPosition, ghostRotation);
+        Debug.Log("portable camera created");
         _cameraCentral.AddCamera(portableCamera.GetComponent<PortableCamera>());
     }
     

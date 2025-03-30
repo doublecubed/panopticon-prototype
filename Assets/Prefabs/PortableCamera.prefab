@@ -2920,7 +2920,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cameraCradle: {fileID: 8056852393597891727}
-  _camera: {fileID: 8795319339893277942}
+  <Camera>k__BackingField: {fileID: 8795319339893277942}
   _previewCamera: {fileID: 6846764117997952764}
 --- !u!114 &5187716753831625852
 MonoBehaviour:

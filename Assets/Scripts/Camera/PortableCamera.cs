@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PortableCamera : MonoBehaviour
 {
@@ -8,7 +9,8 @@ public class PortableCamera : MonoBehaviour
     private CameraCentral _cameraCentral;
     [SerializeField] private Transform _cameraCradle;
 
-    [SerializeField] private Camera _camera;
+    [field: SerializeField] public Camera Camera { get; private set; }
+    private RenderTexture _renderTexture;
     [SerializeField] private Camera _previewCamera;
     private Rigidbody _rigidbody;
     private Collider _collider;
@@ -25,6 +27,8 @@ public class PortableCamera : MonoBehaviour
         _collider = GetComponent<Collider>();
 
         _cameraPower = GetComponent<CameraPower>();
+        Camera.targetTexture = CameraUtility.CreateRenderTexture();
+        Debug.Log($"Render texture {Camera.targetTexture.name} created for camera");
     }
 
     private void Start()
@@ -48,7 +52,7 @@ public class PortableCamera : MonoBehaviour
     
     public void SetCameraPriority(int value)
     {
-        _camera.depth = value;
+        Camera.depth = value;
     }
 
     public void TurnOn()

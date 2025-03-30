@@ -8,12 +8,7 @@ public class CameraCentral : MonoBehaviour
 
     private CameraPreviewController _cameraPreviewController;
     [SerializeField] private List<PortableCamera> _portableCameras;
-        
-    #endregion
-    
-    #region VARIABLES
-
-    private int _currentCameraIndex;
+    [SerializeField] private List<Monitor> _monitors;
     
     #endregion
     
@@ -22,28 +17,23 @@ public class CameraCentral : MonoBehaviour
     private void Awake()
     {
         _cameraPreviewController = GetComponent<CameraPreviewController>();
-    }
-
-    private void Start()
-    {
         _portableCameras = new List<PortableCamera>();
+        _monitors = new List<Monitor>();
     }
     
     #endregion
 
     #region METHODS
 
+    public void AddMonitor(Monitor monitor)
+    {
+        _monitors.Add(monitor);
+    }
+    
     public void AddCamera(PortableCamera portableCamera)
     {
         portableCamera.SetCameraCentral(this);
         _portableCameras.Add(portableCamera);
-        
-        if (_portableCameras.Count == 1)
-        {
-            portableCamera.SetCameraPriority(10);
-            _currentCameraIndex = 0;
-        }
-        else portableCamera.SetCameraPriority(1);
     }
 
     public void RemoveCamera(PortableCamera portableCamera)
@@ -51,27 +41,29 @@ public class CameraCentral : MonoBehaviour
         if (_portableCameras.Contains(portableCamera)) _portableCameras.Remove(portableCamera);
     }
 
-    public void SwitchToNextCamera()
+    public void SwitchToNextCamera(Monitor monitor)
     {
+        int cameraIndex = monitor.CurrentCameraIndex;
         bool flag = false;
         while (!flag)
         {
-            _currentCameraIndex = (_currentCameraIndex + 1) % _portableCameras.Count;
-            flag = _portableCameras[_currentCameraIndex].IsOn();
+            cameraIndex = (cameraIndex + 1) % _portableCameras.Count;
+            flag = _portableCameras[cameraIndex].IsOn();
         }
-        SetCameraPriorities(_currentCameraIndex);
+        SetCameraToMonitor(_portableCameras[cameraIndex], monitor);
     }
 
-    public void SwitchToPreviousCamera()
+    public void SwitchToPreviousCamera(Monitor monitor)
     {
+        int cameraIndex = monitor.CurrentCameraIndex;
         bool flag = false;
         while (!flag)
         {
-            _currentCameraIndex = (_currentCameraIndex - 1);
-            if (_currentCameraIndex < 0) _currentCameraIndex += _portableCameras.Count;
-            flag = _portableCameras[_currentCameraIndex].IsOn();
+            cameraIndex = (cameraIndex - 1);
+            if (cameraIndex < 0) cameraIndex += _portableCameras.Count;
+            flag = _portableCameras[cameraIndex].IsOn();
         }
-        SetCameraPriorities(_currentCameraIndex);
+        SetCameraToMonitor(_portableCameras[cameraIndex], monitor);
     }
 
     private void SetCameraPriorities(int primaryIndex)
@@ -87,6 +79,29 @@ public class CameraCentral : MonoBehaviour
     {
         if (enable) _cameraPreviewController.UpdateCameraPreview(camera);
         else _cameraPreviewController.ResetCameraPreview();
+    }
+
+    private void BlitCameraToMonitor(Camera camera, Monitor monitor)
+    {
+        RenderTexture cameraTexture = camera.targetTexture;
+        if (cameraTexture != null && monitor.MonitorTexture != null)
+        {
+            Graphics.Blit(cameraTexture, monitor.MonitorTexture);
+        }
+    }
+
+    private void SetCameraToMonitor(PortableCamera cam, Monitor monitor)
+    {
+        BlitCameraToMonitor(cam.Camera, monitor);
+        monitor.SetCameraIndex(_portableCameras.IndexOf(cam));
+    }
+
+    private void SetCameraToMonitor(PortableCamera cam, List<Monitor> monitors)
+    {
+        foreach (Monitor monitor in monitors)
+        {
+            SetCameraToMonitor(cam, monitor);
+        }
     }
     
     #endregion
