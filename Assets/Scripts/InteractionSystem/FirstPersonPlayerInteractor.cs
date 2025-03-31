@@ -10,7 +10,7 @@ namespace InteractionSystem
         #region REFERENCES
 
         private InputController _interactionControl;
-        [SerializeField] private InputActionAsset _inputAsset;
+        //[SerializeField] private InputActionAsset _inputAsset;
         private InputAction _interact;
         private InputAction _interact2;
         

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using InteractionSystem;
+using UnityEngine.Serialization;
 
 public class InputController : MonoBehaviour, IInteractionInputControl
 {
     public static InputController Instance;
 
+    [SerializeField] private InputActionAsset _inventory;
     [SerializeField] private InputActionAsset _globalAsset;
     [SerializeField] private InputActionAsset _playerMovement;
     [SerializeField] private InputActionAsset _monitorControl;
@@ -16,7 +18,8 @@ public class InputController : MonoBehaviour, IInteractionInputControl
     
     
     public bool playerControl;
-    
+
+    public InputActionMap InventoryMap {get; private set;}
     private InputActionMap _interactionMap;
     private InputActionMap _monitorMap;
     private InputActionMap _uiMap;
@@ -30,7 +33,7 @@ public class InputController : MonoBehaviour, IInteractionInputControl
         _monitorMap = _monitorControl.FindActionMap("CameraSwitch");
         _cameraMovementMap = _cameraMovementControl.FindActionMap("CameraAngleMovement");
         _uiMap = InputSystem.actions.FindActionMap("UI");
-        
+        InventoryMap = _inventory.FindActionMap("Inventory");
     }
     
     public List<InputAction> GetInteractionActions()
@@ -92,5 +95,15 @@ public class InputController : MonoBehaviour, IInteractionInputControl
         //_uiMap.Disable();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    public void EnableInventoryControl()
+    {
+        InventoryMap.Enable();
+    }
+
+    public void DisableInventoryControl()
+    {
+        InventoryMap.Disable();
     }
 }
