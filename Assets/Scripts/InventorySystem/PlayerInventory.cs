@@ -59,6 +59,14 @@ namespace InventorySystem
             if (Inventory[slot] != null) return;
 
             Inventory[slot] = item;
+            
+            Sprite icon = item.GetIcon();
+            _inventoryView.DressSlot(slot, icon);
+        }
+
+        public void AddItem(IInventoryItem item)
+        {
+            AddItem(item, CurrentInventoryIndex);
         }
 
         public void RemoveItem(IInventoryItem item, int slot)

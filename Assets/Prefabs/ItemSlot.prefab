@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _background: {fileID: 5592741671850614786}
-  _icon: {fileID: 0}
+  _icon: {fileID: 3231390414175581080}
   _itemTransform: {fileID: 4225622802549728490}
   _indexText: {fileID: 8211510003172392723}
 --- !u!1 &1595012348560213315

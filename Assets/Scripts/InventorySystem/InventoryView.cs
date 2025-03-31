@@ -40,5 +40,15 @@ namespace InventorySystem
                 _slots[i].SetBackgroundAlpha(alpha);
             }
         }
+
+        public void DressSlot(int slotIndex, Sprite icon)
+        {
+            _slots[slotIndex].SetIcon(icon);
+        }
+
+        public void UndressSlot(int slotIndex)
+        {
+            _slots[slotIndex].SetIcon(null);
+        }
     }
 }

@@ -29,5 +29,10 @@ namespace InventorySystem
             Color color = new Color(_background.color.r, _background.color.g, _background.color.b, alpha);
             SetBackgroundColor(color);
         }
+
+        public void SetIcon(Sprite icon)
+        {
+            _icon.sprite = icon;
+        }
     }
 }

@@ -1,13 +1,20 @@
 using NewInteractionSystem;
+using InventorySystem;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cube : MonoBehaviour, IInteractable
+public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IInventoryItem
 {
-    [SerializeField] private string _itemName;
+    [field: SerializeField] public string Name;
+    [field: SerializeField] public Sprite Icon; 
     
     public string GetItemName()
     {
-        return _itemName;
+        return Name;
+    }
+
+    public Sprite GetIcon()
+    {
+        return Icon;
     }
 }

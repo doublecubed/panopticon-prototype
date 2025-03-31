@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using InventorySystem;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro;
 
 namespace NewInteractionSystem
@@ -12,6 +14,14 @@ namespace NewInteractionSystem
         #region Self Components
         [SerializeField] private Camera _playerCam;
         [SerializeField] private PlayerInventory _inventory;
+        #endregion
+        
+        #region Input
+        
+        private InputController _inputController;
+        private InputAction _interactPrimary;
+        private InputAction _interactSecondary;
+        
         #endregion
         
         #region Interactable Info
@@ -44,13 +54,17 @@ namespace NewInteractionSystem
         #region VARIABLES
 
         [SerializeField] private float _interactionDistance;
+        private bool _inputEnabled;
         
         #endregion
         
         #region MONOBEHAVIOUR
 
-        
-        
+        private void Start()
+        {
+            InitializeControls();
+        }
+
         private void Update()
         {
             ResetInteractables();
@@ -59,6 +73,9 @@ namespace NewInteractionSystem
             DetectPrimaryInteraction();
             DetectSecondaryInteraction();
             PrepareInteractionContext();
+            
+            ActivateInteractionInput();
+            
             DressInteractionView();
         }
 
@@ -66,6 +83,21 @@ namespace NewInteractionSystem
         
         #region METHODS
 
+        #region Initialization
+
+        private void InitializeControls()
+        {
+            _inputController = InputController.Instance;
+            List<InputAction> actions = _inputController.GetInteractionActions();
+            _interactPrimary = actions[0];
+            _interactPrimary.performed += InteractPrimary;
+            _interactSecondary = actions[1];
+            _interactSecondary.performed += InteractSecondary;
+        }
+        
+        #endregion
+        
+        #region Interaction Processing
         private void ResetInteractables()
         {
             _inventoryInteractable = null;
@@ -133,15 +165,67 @@ namespace NewInteractionSystem
                 _inventoryInteractableTypes, _worldInteractableTypes,
                 _hit, _playerCam);
         }
-
+        #endregion
+        
+        #region Interaction HUD
+        
         private void DressInteractionView()
         {
             string inventoryName = _inventoryInteractable == null ? "" : _inventoryInteractable.GetItemName();
-            string intermediary = (_inventoryInteractable == null && _worldInteractable == null) ? "" : "-";
+            string intermediary = (_inventoryInteractable == null || _worldInteractable == null) ? "" : "-";
             string worldName =  _worldInteractable == null ? "" : _worldInteractable.GetItemName();
             
             _interactableNameText.text = inventoryName + intermediary + worldName;
+
+            _primaryInteractionPromptText.text =
+                _primaryInteraction == InteractionType.None ? "" : _primaryInteraction.ToString();
+            
+            _secondaryInteractionPromptText.text =
+                _secondaryInteraction == InteractionType.None ? "" : _secondaryInteraction.ToString();
         }
+
+        #endregion
+        
+        #region Input
+        
+        private void ActivateInteractionInput()
+        {
+            bool shouldBeEnabled = CurrentInteractionContext.PrimaryInteraction != InteractionType.None 
+                                   || CurrentInteractionContext.SecondaryInteraction != InteractionType.None;
+    
+            if (_inputEnabled != shouldBeEnabled)
+            {
+                _inputEnabled = shouldBeEnabled;
+        
+                if (shouldBeEnabled)
+                    _inputController.EnableInteractionControl();
+                else
+                    _inputController.DisableInteractionControl();
+            }
+        }
+
+        private void InteractPrimary(InputAction.CallbackContext context)
+        {
+            Debug.Log("Primary interaction engaged");
+            
+            if (CurrentInteractionContext.PrimaryInteraction == InteractionType.None) return;
+            
+            if (CurrentInteractionContext.PrimaryInteraction == InteractionType.Pickup)
+            {
+                if (_inventory.CurrentInventoryItem == null && CurrentInteractionContext.WorldInteractable is IInventoryItem)
+                {
+                    Debug.Log("Primary interaction successful");
+                    _inventory.AddItem(CurrentInteractionContext.WorldInteractable as IInventoryItem);
+                }
+            }
+        }
+
+        private void InteractSecondary(InputAction.CallbackContext context)
+        {
+            Debug.Log("Secondary interaction engaged");
+        }
+        
+        #endregion
         
         #endregion
     }
