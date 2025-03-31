@@ -1,0 +1,148 @@
+using System.Collections.Generic;
+using InventorySystem;
+using UnityEngine;
+using TMPro;
+
+namespace NewInteractionSystem
+{
+    public class Interactor : MonoBehaviour
+    {
+        #region REFERENCES
+
+        #region Self Components
+        [SerializeField] private Camera _playerCam;
+        [SerializeField] private PlayerInventory _inventory;
+        #endregion
+        
+        #region Interactable Info
+        
+        private IInteractable _inventoryInteractable;
+        private IInteractable _worldInteractable;
+        
+        private List<InteractableType> _inventoryInteractableTypes;
+        private List<InteractableType> _worldInteractableTypes;
+
+        private InteractionType _primaryInteraction;
+        private InteractionType _secondaryInteraction;
+
+        private RaycastHit _hit;
+        
+        public InteractionContext CurrentInteractionContext { get; private set; }
+        
+        #endregion
+
+        #region View Info
+
+        [SerializeField] private TMP_Text _interactableNameText;
+        [SerializeField] private TMP_Text _primaryInteractionPromptText;
+        [SerializeField] private TMP_Text _secondaryInteractionPromptText;
+        
+        #endregion
+        
+        #endregion
+        
+        #region VARIABLES
+
+        [SerializeField] private float _interactionDistance;
+        
+        #endregion
+        
+        #region MONOBEHAVIOUR
+
+        
+        
+        private void Update()
+        {
+            ResetInteractables();
+            DetectInventoryInteractables();
+            DetectWorldInteractables();
+            DetectPrimaryInteraction();
+            DetectSecondaryInteraction();
+            PrepareInteractionContext();
+            DressInteractionView();
+        }
+
+        #endregion
+        
+        #region METHODS
+
+        private void ResetInteractables()
+        {
+            _inventoryInteractable = null;
+            _worldInteractable = null;
+            
+            _inventoryInteractableTypes = new List<InteractableType>();
+            _worldInteractableTypes = new List<InteractableType>();
+            
+            _primaryInteraction = InteractionType.None;
+            _secondaryInteraction = InteractionType.None;
+        }
+        
+        private void DetectInventoryInteractables()
+        {
+            IInventoryItem currentItem = _inventory.CurrentInventoryItem;
+            if (currentItem == null) return;
+            if (currentItem ! is IInteractable) return;
+            _inventoryInteractable = currentItem as IInteractable;
+            
+            if (currentItem is IDropable) _inventoryInteractableTypes.Add(InteractableType.Dropable);
+            if (currentItem is IAttachable) _inventoryInteractableTypes.Add(InteractableType.Attachable);
+            if (currentItem is IUseable) _inventoryInteractableTypes.Add(InteractableType.Useable);
+            if (currentItem is IAppliable) _inventoryInteractableTypes.Add(InteractableType.Appliable);
+        }
+
+        private void DetectWorldInteractables()
+        {
+            Ray cameraRay = _playerCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+
+            if (!Physics.Raycast(cameraRay, out RaycastHit hit, Mathf.Infinity)) return;
+            if (!hit.transform.TryGetComponent(out IInteractable primary)) return;
+            _worldInteractable = primary;
+            
+            if (hit.transform.TryGetComponent(out IPickupable pickupable)) 
+                _worldInteractableTypes.Add(InteractableType.Pickupable);
+            if (hit.transform.TryGetComponent(out ISocket socket))
+                _worldInteractableTypes.Add(InteractableType.Socket);
+            if (hit.transform.TryGetComponent(out IActivatable activatable))
+                _worldInteractableTypes.Add(InteractableType.Activatable);
+            if (hit.transform.TryGetComponent(out IReceiving receiving))
+                _worldInteractableTypes.Add(InteractableType.Receiving);
+            
+            _hit = hit;
+        }
+
+        private void DetectPrimaryInteraction()
+        {
+            _primaryInteraction = _hit.distance > _interactionDistance ?
+                InteractionType.None :
+                InteractionHelper.CanInteractPrimary(_inventoryInteractableTypes, _worldInteractableTypes);
+        }
+
+        private void DetectSecondaryInteraction()
+        {
+            _secondaryInteraction = _hit.distance > _interactionDistance ?
+                InteractionType.None :
+                InteractionHelper.CanInteractSecondary(_inventoryInteractableTypes, _worldInteractableTypes);
+        }
+
+        private void PrepareInteractionContext()
+        {
+            CurrentInteractionContext = new InteractionContext(this,
+                _inventoryInteractable, _worldInteractable,
+                _primaryInteraction, _secondaryInteraction,
+                _inventoryInteractableTypes, _worldInteractableTypes,
+                _hit, _playerCam);
+        }
+
+        private void DressInteractionView()
+        {
+            string inventoryName = _inventoryInteractable == null ? "" : _inventoryInteractable.GetItemName();
+            string intermediary = (_inventoryInteractable == null && _worldInteractable == null) ? "" : "-";
+            string worldName =  _worldInteractable == null ? "" : _worldInteractable.GetItemName();
+            
+            _interactableNameText.text = inventoryName + intermediary + worldName;
+        }
+        
+        #endregion
+    }
+}

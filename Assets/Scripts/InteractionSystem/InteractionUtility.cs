@@ -116,6 +116,13 @@ namespace InteractionSystem
 
     public struct InteractableInfo
     {
+        public InteractableInfo(string name, string prompt, InteractionType type)
+        {
+            Name = name;
+            Prompt = prompt;
+            Type = type;
+        }
+        
         public string Name;
         public string Prompt;
         public InteractionType Type;

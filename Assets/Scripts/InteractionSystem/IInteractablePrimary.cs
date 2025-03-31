@@ -6,6 +6,8 @@ namespace InteractionSystem
     {
         public InteractableInfo GetInfoPrimary(InteractionContext context);
         
+        public bool CanInteractPrimary(InteractionContext context);
+        
         public void InteractPrimary(InteractionContext context);
     }
 

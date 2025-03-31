@@ -29,12 +29,22 @@ public class CameraInteraction : MonoBehaviour, IInteractablePrimary, IInteracta
         throw new NotImplementedException();
     }
 
+    public bool CanInteractPrimary(InteractionContext context)
+    {
+        throw new NotImplementedException();
+    }
+
     public void InteractPrimary(InteractionContext context)
     {
         throw new NotImplementedException();
     }
 
     public InteractableInfo GetInfoSecondary(InteractionContext context)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool CanInteractSecondary(InteractionContext context)
     {
         throw new NotImplementedException();
     }

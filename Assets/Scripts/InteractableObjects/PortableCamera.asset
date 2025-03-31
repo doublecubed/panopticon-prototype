@@ -17,7 +17,7 @@ MonoBehaviour:
   Icon: {fileID: 21300000, guid: 7548f9051fe9e6847a260f31314025ac, type: 3}
   PickupPrompt: Collect
   DropPrompt: Place
-  AttachPrompt: 
+  AttachPrompt: Attach
   ActivatePrompt: Toggle Power
-  UsePrompt: 
-  UseOnPrompt: 
+  UsePrompt: Use
+  UseOnPrompt: Use On
