@@ -1,10 +1,11 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace InteractionSystem
 {
     public class InteractionContext
     {
-        public InteractionType InteractionType { get; private set; }
+        public List<InteractionSet> InteractionSets { get; private set; }
         
         public FirstPersonPlayerInteractor Interactor { get; private set; }
     
@@ -18,9 +19,9 @@ namespace InteractionSystem
     
         public bool IsHoldingInteractButton { get; set; }
     
-        public InteractionContext(FirstPersonPlayerInteractor interactor, RaycastHit hit, Camera playerCamera, InteractionType interactionType)
+        public InteractionContext(FirstPersonPlayerInteractor interactor, RaycastHit hit, Camera playerCamera, List<InteractionSet> interactionSets)
         {
-            InteractionType = interactionType;
+            InteractionSets = interactionSets;
             Interactor = interactor;
             RaycastHit = hit;
             PlayerCamera = playerCamera;

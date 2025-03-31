@@ -19,22 +19,26 @@ namespace InteractionSystem
 
         #region Raycast
         [SerializeField] private Camera _playerCam;
-        private IInteractablePrimary _currentInteractablePrimary;
-        private IInteractableSecondary _currentInteractableSecondary;
-        private Transform _currentInteractableTransform;
-        private InteractionContext _currentInteractionContext;
+        private IInteractablePrimary _currentWorldInteractablePrimary;
+        private IInteractableSecondary _currentWorldInteractableSecondary;
+        private Transform _currentWorldInteractableTransform;
+        private RaycastHit _currentHit;
+
         #endregion
         
         #region Inventory
 
         private PlayerInventory _playerInventory;
         private IInventoryItem _currentInventoryItem;
+        private IInteractablePrimary _currentInventoryInteractablePrimary;
+        private IInteractableSecondary _currentInventoryInteractableSecondary;
         
         #endregion
         
         #region Processing
         
         private Dictionary<int, List<InteractionSet>> _interactionMap;
+        private InteractionContext _currentInteractionContext;
         
         #endregion
         
@@ -74,7 +78,8 @@ namespace InteractionSystem
         
         private void Update()
         {
-            RaycastFromCamera();
+            DetectWorldInteractables();
+            GetCurrentInventoryItem();
         }
 
         #endregion
@@ -102,51 +107,42 @@ namespace InteractionSystem
         
         #region Interactable Detection
         
-        private void RaycastFromCamera()
+        private void DetectWorldInteractables()
         {
             Ray cameraRay = _playerCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             
-            ResetCurrentInteractable();
+            ResetCurrentWorldInteractables();
 
             if (!Physics.Raycast(cameraRay, out RaycastHit hit, _interactionRange)) 
                 return;
             
-            if (!hit.transform.TryGetComponent(out IInteractablePrimary interactable) || interactable == null) 
-                return;
-
+            if (!hit.transform.TryGetComponent(out IInteractablePrimary primary)
+                || !hit.transform.TryGetComponent(out IInteractableSecondary secondary)) return;
+            
             if (DistanceToInteractable(hit.transform) > _interactionRange)
                 return;
-            
-            SetCurrentPrimaryInteractable(interactable, hit.transform);
-            SetInteractionContext(hit);
-            
-            hit.transform.TryGetComponent(out IInteractableSecondary secondaryInteractable);
-            SetCurrentSecondaryInteractable(secondaryInteractable, hit.transform);
-            
-            SetInteractableTexts();
-        }
 
-        private void DetectWorldInteractables()
-        {
+            if (primary != null) SetCurrentPrimaryInteractable(primary, hit.transform);
+            if (secondary != null) SetCurrentSecondaryInteractable(secondary, hit.transform);
             
+            _currentHit = hit;
         }
         
         private void SetCurrentSecondaryInteractable(IInteractableSecondary secondaryInteractable, Transform transform)
         {
-            _currentInteractableSecondary = secondaryInteractable;
+            _currentWorldInteractableSecondary = secondaryInteractable;
+            _currentWorldInteractableTransform = transform;
             ToggleInput(_interact2, true);
         }
         
         private void SetCurrentPrimaryInteractable(IInteractablePrimary interactablePrimary, Transform transform)
         {
-            _currentInteractablePrimary = interactablePrimary;
-            _currentInteractableTransform = transform;
+            _currentWorldInteractablePrimary = interactablePrimary;
+            _currentWorldInteractableTransform = transform;
             ToggleInput(_interact, true);
         }
 
-
-        
-        private void ResetCurrentInteractable()
+        private void ResetCurrentWorldInteractables()
         {
             ToggleInput(_interact, false);
             ToggleInput(_interact2, false);
@@ -155,8 +151,7 @@ namespace InteractionSystem
             SetInteractableTexts();
         }
 
-
-        
+       
         private float DistanceToInteractable(Transform interactable)
         {
             return Vector3.Distance(interactable.position, transform.position);
@@ -169,30 +164,49 @@ namespace InteractionSystem
         private void GetCurrentInventoryItem()
         {
             _currentInventoryItem = _playerInventory.CurrentInventoryItem;
+            if (_currentInventoryItem is IInteractablePrimary)
+                _currentInventoryInteractablePrimary = _currentInventoryItem as IInteractablePrimary;
+            if (_currentInventoryItem is IInteractableSecondary)
+                _currentInventoryInteractableSecondary = _currentInventoryItem as IInteractableSecondary;
+        }
+
+        private void ResetCurrentInventoryInteractables()
+        {
+            _currentInventoryItem = null;
+            _currentInventoryInteractablePrimary = null;
+            _currentInventoryInteractableSecondary = null;
         }
         
         #endregion
         
         #region Interaction Processing
 
-        private void SetInteractionContext(RaycastHit hit)
+        private void SetInteractionContext(RaycastHit hit, List<InteractionSet> interactionSets)
         {
-            // PROBLEM
-            InteractionContext context = new InteractionContext(this, hit, _playerCam, InteractionType.None);
+            _currentInteractionContext = new InteractionContext(this, hit, _playerCam,interactionSets);
         }
         
         private void SetInteractableTexts()
         {
-            _interactableNameText.text = _currentInteractablePrimary != null ? _currentInteractablePrimary.GetInfoPrimary(_currentInteractionContext).Name : "";
-            _interactablePromptText.text = _currentInteractablePrimary != null ? _currentInteractablePrimary.GetInfoPrimary(_currentInteractionContext).Prompt : "";
-            _secondaryInteractablePromptText.text = _currentInteractableSecondary != null
-                ? _currentInteractableSecondary.GetInfoSecondary(_currentInteractionContext).Prompt
+            _interactableNameText.text = _currentWorldInteractablePrimary != null ? _currentWorldInteractablePrimary.GetInfoPrimary(_currentInteractionContext).Name : "";
+            _interactablePromptText.text = _currentWorldInteractablePrimary != null ? _currentWorldInteractablePrimary.GetInfoPrimary(_currentInteractionContext).Prompt : "";
+            _secondaryInteractablePromptText.text = _currentWorldInteractableSecondary != null
+                ? _currentWorldInteractableSecondary.GetInfoSecondary(_currentInteractionContext).Prompt
                 : "";
         }
         
         private void ProcessInteractions()
         {
+            bool worldPrimary = _currentWorldInteractablePrimary != null;
+            bool worldSecondary = _currentWorldInteractableSecondary != null;
+            bool inventoryPrimary = _currentWorldInteractablePrimary != null;
+            bool inventorySecondary = _currentWorldInteractableSecondary != null;
+           
+            int interactionCaseIndex = InteractionUtility.InteractionInteger(worldPrimary, worldSecondary, inventoryPrimary, inventorySecondary);
             
+            List<InteractionSet> interactionSets = _interactionMap[interactionCaseIndex];
+            
+            SetInteractionContext(_currentHit, interactionSets);
         }
         
         #endregion
@@ -201,12 +215,12 @@ namespace InteractionSystem
         
         private void Interact(InputAction.CallbackContext context)
         {
-            _currentInteractablePrimary?.InteractPrimary(_currentInteractionContext);
+            _currentWorldInteractablePrimary?.InteractPrimary(_currentInteractionContext);
         }
 
         private void SecondaryInteract(InputAction.CallbackContext context)
         {
-            _currentInteractableSecondary?.InteractSecondary(_currentInteractionContext);
+            _currentWorldInteractableSecondary?.InteractSecondary(_currentInteractionContext);
         }
 
         private void ToggleInput(InputAction action, bool toggle)
