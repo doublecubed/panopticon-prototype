@@ -12,15 +12,14 @@ namespace InventorySystem
         [SerializeField] private InventoryView _inventoryView;
         private InputController _inputController;
         public IInventoryItem[] Inventory {get; private set;}
-        
+        [field: SerializeField] public IInventoryItem CurrentInventoryItem { get; private set;}
+
         #endregion
         
         #region VARIABLES
 
         [field: SerializeField] public int InventorySize { get; private set;}
         [field: SerializeField] public int CurrentInventoryIndex { get; private set;}
-        
-        [field: SerializeField] public IInventoryItem CurrentInventoryItem { get; private set;}
         
         #endregion
         
@@ -72,7 +71,6 @@ namespace InventorySystem
 
         private void SelectNextSlot()
         {
-            Debug.Log("Select next item");
             CurrentInventoryIndex = (CurrentInventoryIndex + 1) % InventorySize;
             SelectInventoryItem(CurrentInventoryIndex);
             
@@ -81,7 +79,6 @@ namespace InventorySystem
 
         private void SelectPreviousSlot()
         {
-            Debug.Log("Select previous item");
             CurrentInventoryIndex = (CurrentInventoryIndex - 1);
             if (CurrentInventoryIndex < 0) CurrentInventoryIndex += InventorySize;
             SelectInventoryItem(CurrentInventoryIndex);
@@ -93,8 +90,6 @@ namespace InventorySystem
         {
             if (Inventory[index] == null) CurrentInventoryItem = null;
             else CurrentInventoryItem = Inventory[index];
-            
-            Debug.Log($"Selected {CurrentInventoryItem}");
         }
         
         #endregion

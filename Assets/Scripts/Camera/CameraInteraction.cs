@@ -4,13 +4,18 @@ using UnityEngine;
 using InteractionSystem;
 using UnityEngine.Serialization;
 
-public class CameraInteraction : InteractableDouble
+public class CameraInteraction : MonoBehaviour, IInteractablePrimary, IInteractableSecondary
 {
+    [SerializeField] private InteractionObject _interactionObject;
+    
     private CameraAngleAdjuster _angleAdjuster;
     private CameraModuleCanvas _moduleCanvas;
     
     public bool AdjustmentActive { get; private set; }
     public bool CanvasActive { get; private set; }
+
+    private InteractableInfo _primaryInfo;
+    private InteractableInfo _secondaryInfo;
     
     private void Awake()
     {
@@ -18,19 +23,24 @@ public class CameraInteraction : InteractableDouble
         _moduleCanvas = GetComponent<CameraModuleCanvas>();
     }
 
-    public override void Interact(InteractionContext context)
+
+    public InteractableInfo GetInfoPrimary(InteractionContext context)
     {
-        if (!AdjustmentActive) _angleAdjuster.Activate();
-        else _angleAdjuster.Deactivate();
-        
-        AdjustmentActive = !AdjustmentActive;
+        throw new NotImplementedException();
     }
 
-    public override void InteractSecondary(InteractionContext context)
+    public void InteractPrimary(InteractionContext context)
     {
-        if (!CanvasActive) _moduleCanvas.OpenCanvas();
-        else _moduleCanvas.CloseCanvas();
-        
-        CanvasActive = !CanvasActive;
+        throw new NotImplementedException();
+    }
+
+    public InteractableInfo GetInfoSecondary(InteractionContext context)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void InteractSecondary(InteractionContext context)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using InventorySystem;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -9,17 +11,34 @@ namespace InteractionSystem
     {
         #region REFERENCES
 
+        #region Input
         private InputController _interactionControl;
-        //[SerializeField] private InputActionAsset _inputAsset;
         private InputAction _interact;
         private InputAction _interact2;
-        
-        [SerializeField] private Camera _playerCam;
+        #endregion
 
-        private IInteractable _currentInteractable;
-        private IInteractableSecondary _currentSecondaryInteractable;
+        #region Raycast
+        [SerializeField] private Camera _playerCam;
+        private IInteractablePrimary _currentInteractablePrimary;
+        private IInteractableSecondary _currentInteractableSecondary;
         private Transform _currentInteractableTransform;
         private InteractionContext _currentInteractionContext;
+        #endregion
+        
+        #region Inventory
+
+        private PlayerInventory _playerInventory;
+        private IInventoryItem _currentInventoryItem;
+        
+        #endregion
+        
+        #region Processing
+        
+        private Dictionary<int, List<InteractionSet>> _interactionMap;
+        
+        #endregion
+        
+        #region View
         
         [SerializeField] private TextMeshProUGUI _interactableNameText;
         [SerializeField] private TextMeshProUGUI _interactablePromptText;
@@ -27,16 +46,29 @@ namespace InteractionSystem
         
         #endregion
         
+        #endregion
+        
         #region VARIABLES
 
         [SerializeField] private float _interactionRange;
+
+        private bool _hasInventoryPrimary;
+        private bool _hasInventorySecondary;
+        private bool _hasWorldPrimary;
+        private bool _hasWorldSecondary;
         
         #endregion
         
         #region MONOBEHAVIOUR
 
+        private void Awake()
+        {
+            _playerInventory = GetComponent<PlayerInventory>();
+        }
+
         private void Start()
         {
+            CreateInteractionMap();
             ReceiveInputActions();
         }
         
@@ -49,6 +81,13 @@ namespace InteractionSystem
         
         #region METHODS
 
+        #region Initialization
+
+        private void CreateInteractionMap()
+        {
+            _interactionMap = InteractionUtility.CreateInteractionMap();
+        }
+        
         private void ReceiveInputActions()
         {
             _interactionControl = InputController.Instance; 
@@ -59,6 +98,10 @@ namespace InteractionSystem
             _interact2.performed += SecondaryInteract;
         }
         
+        #endregion
+        
+        #region Interactable Detection
+        
         private void RaycastFromCamera()
         {
             Ray cameraRay = _playerCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
@@ -68,71 +111,102 @@ namespace InteractionSystem
             if (!Physics.Raycast(cameraRay, out RaycastHit hit, _interactionRange)) 
                 return;
             
-            if (!hit.transform.TryGetComponent(out IInteractable interactable) || interactable == null) 
+            if (!hit.transform.TryGetComponent(out IInteractablePrimary interactable) || interactable == null) 
                 return;
 
             if (DistanceToInteractable(hit.transform) > _interactionRange)
                 return;
             
-            
-            SetCurrentInteractable(interactable, hit.transform);
+            SetCurrentPrimaryInteractable(interactable, hit.transform);
             SetInteractionContext(hit);
             
             hit.transform.TryGetComponent(out IInteractableSecondary secondaryInteractable);
-            SetCurrentSecondaryInteractable(secondaryInteractable);
+            SetCurrentSecondaryInteractable(secondaryInteractable, hit.transform);
             
             SetInteractableTexts();
         }
 
-        private void SetCurrentSecondaryInteractable(IInteractableSecondary secondaryInteractable)
+        private void DetectWorldInteractables()
         {
-            _currentSecondaryInteractable = secondaryInteractable;
+            
+        }
+        
+        private void SetCurrentSecondaryInteractable(IInteractableSecondary secondaryInteractable, Transform transform)
+        {
+            _currentInteractableSecondary = secondaryInteractable;
             ToggleInput(_interact2, true);
         }
         
-        private void SetCurrentInteractable(IInteractable interactable, Transform transform)
+        private void SetCurrentPrimaryInteractable(IInteractablePrimary interactablePrimary, Transform transform)
         {
-            _currentInteractable = interactable;
+            _currentInteractablePrimary = interactablePrimary;
             _currentInteractableTransform = transform;
             ToggleInput(_interact, true);
         }
 
-        private void SetInteractionContext(RaycastHit hit)
-        {
-            InteractionContext context = new InteractionContext(this, hit, _playerCam);
-        }
+
         
         private void ResetCurrentInteractable()
         {
             ToggleInput(_interact, false);
             ToggleInput(_interact2, false);
-            SetCurrentInteractable(null, null);
-            SetCurrentSecondaryInteractable(null);
+            SetCurrentPrimaryInteractable(null, null);
+            SetCurrentSecondaryInteractable(null, null);
             SetInteractableTexts();
         }
 
-        private void SetInteractableTexts()
-        {
-            _interactableNameText.text = _currentInteractable != null ? _currentInteractable.GetName() : "";
-            _interactablePromptText.text = _currentInteractable != null ? _currentInteractable.InteractionPrompt() : "";
-            _secondaryInteractablePromptText.text = _currentSecondaryInteractable != null
-                ? _currentSecondaryInteractable.SecondaryInteractionPrompt()
-                : "";
-        }
+
         
         private float DistanceToInteractable(Transform interactable)
         {
             return Vector3.Distance(interactable.position, transform.position);
         }
 
+        #endregion
+        
+        #region Inventory Detection
+
+        private void GetCurrentInventoryItem()
+        {
+            _currentInventoryItem = _playerInventory.CurrentInventoryItem;
+        }
+        
+        #endregion
+        
+        #region Interaction Processing
+
+        private void SetInteractionContext(RaycastHit hit)
+        {
+            // PROBLEM
+            InteractionContext context = new InteractionContext(this, hit, _playerCam, InteractionType.None);
+        }
+        
+        private void SetInteractableTexts()
+        {
+            _interactableNameText.text = _currentInteractablePrimary != null ? _currentInteractablePrimary.GetInfoPrimary(_currentInteractionContext).Name : "";
+            _interactablePromptText.text = _currentInteractablePrimary != null ? _currentInteractablePrimary.GetInfoPrimary(_currentInteractionContext).Prompt : "";
+            _secondaryInteractablePromptText.text = _currentInteractableSecondary != null
+                ? _currentInteractableSecondary.GetInfoSecondary(_currentInteractionContext).Prompt
+                : "";
+        }
+        
+        private void ProcessInteractions()
+        {
+            
+        }
+        
+        #endregion
+        
+        #region Interaction Execution
+        
         private void Interact(InputAction.CallbackContext context)
         {
-            _currentInteractable?.Interact(_currentInteractionContext);
+            _currentInteractablePrimary?.InteractPrimary(_currentInteractionContext);
         }
 
         private void SecondaryInteract(InputAction.CallbackContext context)
         {
-            _currentSecondaryInteractable?.InteractSecondary(_currentInteractionContext);
+            _currentInteractableSecondary?.InteractSecondary(_currentInteractionContext);
         }
 
         private void ToggleInput(InputAction action, bool toggle)
@@ -143,6 +217,8 @@ namespace InteractionSystem
             //if (toggle) action.Enable();
             //else action.Disable();
         }
+        
+        #endregion
         
         #endregion
     }
