@@ -213,28 +213,12 @@ namespace NewInteractionSystem
 
         private void InteractPrimary(InputAction.CallbackContext context)
         {
-            _executer.ExecuteInteraction(CurrentInteractionContext);
-            
-            if (CurrentInteractionContext.PrimaryInteraction == InteractionType.None) return;
-            
-            if (CurrentInteractionContext.PrimaryInteraction == InteractionType.Pickup)
-            {
-                //_executer.ExecutePickup(CurrentInteractionContext);
-            }
-
-            if (CurrentInteractionContext.PrimaryInteraction == InteractionType.Drop)
-            {
-                //_executer.ExecuteDrop(CurrentInteractionContext);
-            }
-
-            if (CurrentInteractionContext.PrimaryInteraction == InteractionType.Attach)
-            {
-                
-            }
+            _executer.ExecutePrimaryInteraction(CurrentInteractionContext);
         }
 
         private void InteractSecondary(InputAction.CallbackContext context)
         {
+            _executer.ExecuteSecondaryInteraction(CurrentInteractionContext);
         }
         
         #endregion

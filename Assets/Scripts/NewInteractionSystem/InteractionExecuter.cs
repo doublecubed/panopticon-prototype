@@ -27,7 +27,7 @@ namespace NewInteractionSystem
         
         #region General
 
-        public void ExecuteInteraction(InteractionContext interactionContext)
+        public void ExecutePrimaryInteraction(InteractionContext interactionContext)
         {
             switch (interactionContext.PrimaryInteraction)
             {
@@ -41,6 +41,24 @@ namespace NewInteractionSystem
                     return;
                 case InteractionType.Attach:
                     ExecuteAttach(interactionContext);
+                    return;
+            }
+        }
+        
+        public void ExecuteSecondaryInteraction(InteractionContext interactionContext)
+        {
+            switch (interactionContext.SecondaryInteraction)
+            {
+                case InteractionType.None:
+                    return;
+                case InteractionType.Use:
+                    ExecuteUse(interactionContext);
+                    return;
+                case InteractionType.Activate:
+                    ExecuteActivate(interactionContext);
+                    return;
+                case InteractionType.Apply:
+                    ExecuteApply(interactionContext);
                     return;
             }
         }
@@ -117,6 +135,33 @@ namespace NewInteractionSystem
         
         #endregion
         
+        #region Use
+
+        private void ExecuteUse(InteractionContext context)
+        {
+            (context.InventoryInteractable as IUseable).Use(context);
+        }
+        
+        #endregion
+        
+        #region Activate
+
+        private void ExecuteActivate(InteractionContext context)
+        {
+            (context.WorldInteractable as IActivatable).Activate(context);
+        }
+        
+        #endregion
+
+        #region Apply
+        
+        private void ExecuteApply(InteractionContext context)
+        {
+            (context.InventoryInteractable as IAppliable).Apply(context);
+            (context.WorldInteractable as IReceiving).ReceiveAppliable(context);
+        }
+        
+        #endregion
         
         #endregion
     }

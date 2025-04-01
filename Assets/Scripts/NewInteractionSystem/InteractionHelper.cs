@@ -13,12 +13,10 @@ namespace NewInteractionSystem
                 return InteractionType.Drop;                
             }
 
-
             if (inventory.Count == 0 && world.Contains(InteractableType.Pickupable))
             {
                 return InteractionType.Pickup;                
             }
-
 
             if (inventory.Contains(InteractableType.Attachable) && world.Contains(InteractableType.Socket))
                 return InteractionType.Attach;
