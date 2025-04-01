@@ -13,7 +13,8 @@ namespace NewInteractionSystem
 
         #region Self Components
         [SerializeField] private Camera _playerCam;
-        [SerializeField] private PlayerInventory _inventory;
+        private PlayerInventory _inventory;
+        private InteractionExecuter _executer;
         #endregion
         
         #region Input
@@ -59,6 +60,12 @@ namespace NewInteractionSystem
         #endregion
         
         #region MONOBEHAVIOUR
+
+        private void Awake()
+        {
+            _inventory = GetComponent<PlayerInventory>();
+            _executer = GetComponent<InteractionExecuter>();
+        }
 
         private void Start()
         {
@@ -214,8 +221,7 @@ namespace NewInteractionSystem
             {
                 if (_inventory.CurrentInventoryItem == null && CurrentInteractionContext.WorldInteractable is IInventoryItem)
                 {
-                    Debug.Log("Primary interaction successful");
-                    _inventory.AddItem(CurrentInteractionContext.WorldInteractable as IInventoryItem);
+                    _executer.ExecutePickup(CurrentInteractionContext);
                 }
             }
         }

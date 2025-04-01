@@ -12,6 +12,7 @@ namespace InventorySystem
         [SerializeField] private InventoryView _inventoryView;
         private InputController _inputController;
         public IInventoryItem[] Inventory {get; private set;}
+        public GameObject[] InventoryObjects {get; private set;}
         [field: SerializeField] public IInventoryItem CurrentInventoryItem { get; private set;}
 
         #endregion
@@ -37,6 +38,7 @@ namespace InventorySystem
             _scroll = _inputController.InventoryMap.FindAction("Scroll");
             _inputController.EnableInventoryControl();
             Inventory = new IInventoryItem[InventorySize];
+            InventoryObjects = new GameObject[InventorySize];
             CurrentInventoryIndex = 0;
         }
 
@@ -59,6 +61,7 @@ namespace InventorySystem
             if (Inventory[slot] != null) return;
 
             Inventory[slot] = item;
+            InventoryObjects[slot] = InventoryHelper.ItemObject(item);
             
             Sprite icon = item.GetIcon();
             _inventoryView.DressSlot(slot, icon);
@@ -68,7 +71,7 @@ namespace InventorySystem
         {
             AddItem(item, CurrentInventoryIndex);
         }
-
+        
         public void RemoveItem(IInventoryItem item, int slot)
         {
             if (slot >= InventorySize || slot < 0) return;

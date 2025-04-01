@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IInventoryItem
 {
+    [SerializeField] private GameObject _inventoryPrefab;
     [field: SerializeField] public string Name;
     [field: SerializeField] public Sprite Icon; 
     
@@ -16,5 +17,10 @@ public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IIn
     public Sprite GetIcon()
     {
         return Icon;
+    }
+
+    public GameObject GetInventoryPrefab()
+    {
+        return _inventoryPrefab;
     }
 }
