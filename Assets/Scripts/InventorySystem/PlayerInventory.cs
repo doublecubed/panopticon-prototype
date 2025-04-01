@@ -13,8 +13,11 @@ namespace InventorySystem
         private InputController _inputController;
         public IInventoryItem[] Inventory {get; private set;}
         public GameObject[] InventoryObjects {get; private set;}
-        [field: SerializeField] public IInventoryItem CurrentInventoryItem { get; private set;}
-
+        
+        public GameObject[] CarryObjects {get; private set;}
+        public IInventoryItem CurrentInventoryItem { get; private set;}
+        
+        
         #endregion
         
         #region VARIABLES
@@ -39,6 +42,7 @@ namespace InventorySystem
             _inputController.EnableInventoryControl();
             Inventory = new IInventoryItem[InventorySize];
             InventoryObjects = new GameObject[InventorySize];
+            CarryObjects = new GameObject[InventorySize];
             CurrentInventoryIndex = 0;
         }
 
@@ -65,19 +69,39 @@ namespace InventorySystem
             
             Sprite icon = item.GetIcon();
             _inventoryView.DressSlot(slot, icon);
+            
+            SelectInventoryItem(slot);
         }
 
         public void AddItem(IInventoryItem item)
         {
             AddItem(item, CurrentInventoryIndex);
         }
-        
-        public void RemoveItem(IInventoryItem item, int slot)
+
+        public void AddCarryObject(GameObject carry, int slot)
         {
-            if (slot >= InventorySize || slot < 0) return;
-            if (Inventory[slot] == null) return;
+            if (!IsValidSlot(slot)) return;
+            if (!SlotIsFilled(slot)) return;
+            CarryObjects[slot] = carry;
+        }
+
+        public void RemoveCarryObject(int slot)
+        {
+            if (!IsValidSlot(slot)) return;
+            GameObject carryObject = CarryObjects[slot];
+            CarryObjects[slot] = null;
+            Destroy(carryObject);
+        }
+        
+        public void RemoveItem(int slot)
+        {
+            if (!IsValidSlot(slot)) return;
             
             Inventory[slot] = null;
+            InventoryObjects[slot] = null;
+            
+            _inventoryView.UndressSlot(slot);
+            SelectInventoryItem(slot);
         }
 
         private void SelectNextSlot()
@@ -101,6 +125,17 @@ namespace InventorySystem
         {
             if (Inventory[index] == null) CurrentInventoryItem = null;
             else CurrentInventoryItem = Inventory[index];
+        }
+
+        public bool IsValidSlot(int slot)
+        {
+            if (slot >= InventorySize || slot < 0) return false;
+            return true;
+        }
+
+        public bool SlotIsFilled(int slot)
+        {
+            return Inventory[slot] != null;
         }
         
         #endregion

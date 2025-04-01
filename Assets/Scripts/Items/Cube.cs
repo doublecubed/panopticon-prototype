@@ -3,7 +3,7 @@ using InventorySystem;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IInventoryItem
+public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IInventoryItem, IDropable
 {
     [SerializeField] private GameObject _inventoryPrefab;
     [field: SerializeField] public string Name;

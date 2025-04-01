@@ -25,6 +25,8 @@ namespace NewInteractionSystem
         
         #region METHODS
         
+        #region Pickup
+        
         public void ExecutePickup(InteractionContext context)
         {
             IInventoryItem item = context.WorldInteractable as IInventoryItem; 
@@ -37,6 +39,7 @@ namespace NewInteractionSystem
         {
             GameObject prefabInstance = 
                 Instantiate(prefab,  _carryTransform.position, _carryTransform.rotation, _carryTransform);
+            _inventory.AddCarryObject(prefabInstance, _inventory.CurrentInventoryIndex);
         }
 
         private void DeactivateInventoryItem(IInventoryItem item)
@@ -46,6 +49,26 @@ namespace NewInteractionSystem
             itemObject.transform.position = _inventoryStorageTransform.position;
             itemObject.SetActive(false);
         }
+        
+        #endregion
+        
+        #region Drop
+
+        public void ExecuteDrop(InteractionContext context)
+        {
+            int slot = _inventory.CurrentInventoryIndex;
+            _inventory.RemoveCarryObject(slot);
+            Vector3 dropPoint = context.Hit.point;
+            
+            GameObject dropObject = _inventory.InventoryObjects[slot];
+            _inventory.RemoveItem(slot);
+            
+            dropObject.transform.SetParent(null);
+            dropObject.transform.position = dropPoint;
+            dropObject.SetActive(true);
+        }
+        
+        #endregion
         
         #endregion
     }

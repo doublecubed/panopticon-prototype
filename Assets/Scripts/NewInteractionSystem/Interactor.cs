@@ -30,11 +30,11 @@ namespace NewInteractionSystem
         private IInteractable _inventoryInteractable;
         private IInteractable _worldInteractable;
         
-        private List<InteractableType> _inventoryInteractableTypes;
-        private List<InteractableType> _worldInteractableTypes;
+        [SerializeField] private List<InteractableType> _inventoryInteractableTypes;
+        [SerializeField] private List<InteractableType> _worldInteractableTypes;
 
-        private InteractionType _primaryInteraction;
-        private InteractionType _secondaryInteraction;
+        [SerializeField] private InteractionType _primaryInteraction;
+        [SerializeField] private InteractionType _secondaryInteraction;
 
         private RaycastHit _hit;
         
@@ -120,9 +120,11 @@ namespace NewInteractionSystem
         private void DetectInventoryInteractables()
         {
             IInventoryItem currentItem = _inventory.CurrentInventoryItem;
-            if (currentItem == null) return;
-            if (currentItem ! is IInteractable) return;
+           
+            Debug.Log($"before setting: {_inventoryInteractable}");
             _inventoryInteractable = currentItem as IInteractable;
+            Debug.Log($"after setting: {_inventoryInteractable}");
+            Debug.Log($"List has {_inventoryInteractableTypes.Count} elements");
             
             if (currentItem is IDropable) _inventoryInteractableTypes.Add(InteractableType.Dropable);
             if (currentItem is IAttachable) _inventoryInteractableTypes.Add(InteractableType.Attachable);
@@ -134,7 +136,10 @@ namespace NewInteractionSystem
         {
             Ray cameraRay = _playerCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
 
-            if (!Physics.Raycast(cameraRay, out RaycastHit hit, Mathf.Infinity)) return;
+            Physics.Raycast(cameraRay, out RaycastHit hit, Mathf.Infinity);
+            _hit = hit;
+            if (_hit.transform == null) return;
+            
             if (!hit.transform.TryGetComponent(out IInteractable primary)) return;
             _worldInteractable = primary;
             
@@ -146,8 +151,6 @@ namespace NewInteractionSystem
                 _worldInteractableTypes.Add(InteractableType.Activatable);
             if (hit.transform.TryGetComponent(out IReceiving receiving))
                 _worldInteractableTypes.Add(InteractableType.Receiving);
-            
-            _hit = hit;
         }
 
         private void DetectPrimaryInteraction()
@@ -213,8 +216,6 @@ namespace NewInteractionSystem
 
         private void InteractPrimary(InputAction.CallbackContext context)
         {
-            Debug.Log("Primary interaction engaged");
-            
             if (CurrentInteractionContext.PrimaryInteraction == InteractionType.None) return;
             
             if (CurrentInteractionContext.PrimaryInteraction == InteractionType.Pickup)
@@ -224,11 +225,18 @@ namespace NewInteractionSystem
                     _executer.ExecutePickup(CurrentInteractionContext);
                 }
             }
+
+            if (CurrentInteractionContext.PrimaryInteraction == InteractionType.Drop)
+            {
+                if (_inventory.CurrentInventoryItem != null && CurrentInteractionContext.WorldInteractable == null)
+                {
+                    _executer.ExecuteDrop(CurrentInteractionContext);
+                }
+            }
         }
 
         private void InteractSecondary(InputAction.CallbackContext context)
         {
-            Debug.Log("Secondary interaction engaged");
         }
         
         #endregion

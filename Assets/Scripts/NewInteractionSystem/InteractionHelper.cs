@@ -9,10 +9,16 @@ namespace NewInteractionSystem
         public static InteractionType CanInteractPrimary(List<InteractableType> inventory, List<InteractableType> world)
         {
             if (inventory.Contains(InteractableType.Dropable) && world.Count == 0)
-                return InteractionType.Drop;
+            {
+                return InteractionType.Drop;                
+            }
+
 
             if (inventory.Count == 0 && world.Contains(InteractableType.Pickupable))
-                return InteractionType.Pickup;
+            {
+                return InteractionType.Pickup;                
+            }
+
 
             if (inventory.Contains(InteractableType.Attachable) && world.Contains(InteractableType.Socket))
                 return InteractionType.Attach;
