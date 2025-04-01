@@ -14,11 +14,17 @@ public class CubeSocket : MonoBehaviour, IInteractable, ISocket
 
     public bool CanReceiveAttachable(InteractionContext context)
     {
+        Debug.Log("checking Iattachable compatibility");
         return context.InventoryInteractable is IAttachable;
     }
 
     public Transform AttachmentPoint()
     {
         return _attachPoint;
+    }
+
+    public void ReceiveAttachable(InteractionContext context)
+    {
+        Debug.Log("Cube successfully received");
     }
 }

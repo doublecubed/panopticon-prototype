@@ -12,8 +12,8 @@ namespace NewInteractionSystem
         public IInteractable WorldInteractable { get; private set; }
         public InteractionType PrimaryInteraction { get; private set; }
         public InteractionType SecondaryInteraction { get; private set; }
-        public List<InteractableType> InventoryInteractables { get; private set; }
-        public List<InteractableType> WorldInteractables { get; private set; }
+        public List<InteractableType> InventoryInteractableTypes { get; private set; }
+        public List<InteractableType> WorldInteractableTypes { get; private set; }
         public RaycastHit Hit { get; private set; }
         public Camera PlayerCamera { get; private set; }
         
@@ -21,7 +21,7 @@ namespace NewInteractionSystem
         public InteractionContext(Interactor interactor, 
             IInteractable inventoryInteractable, IInteractable worldInteractable, 
             InteractionType primaryInteraction, InteractionType secondaryInteraction, 
-            List<InteractableType> inventoryInteractables, List<InteractableType> worldInteractables, 
+            List<InteractableType> inventoryInteractableTypes, List<InteractableType> worldInteractableTypes, 
             RaycastHit hit, Camera camera)
         {
             Interactor = interactor;
@@ -29,8 +29,8 @@ namespace NewInteractionSystem
             WorldInteractable = worldInteractable;
             PrimaryInteraction = primaryInteraction;
             SecondaryInteraction = secondaryInteraction;
-            InventoryInteractables = inventoryInteractables;
-            WorldInteractables = worldInteractables;
+            InventoryInteractableTypes = inventoryInteractableTypes;
+            WorldInteractableTypes = worldInteractableTypes;
             Hit = hit;
             PlayerCamera = camera;
         }

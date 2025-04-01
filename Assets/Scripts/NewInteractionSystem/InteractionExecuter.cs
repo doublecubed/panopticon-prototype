@@ -25,9 +25,31 @@ namespace NewInteractionSystem
         
         #region METHODS
         
+        #region General
+
+        public void ExecuteInteraction(InteractionContext interactionContext)
+        {
+            switch (interactionContext.PrimaryInteraction)
+            {
+                case InteractionType.None:
+                    return;
+                case InteractionType.Pickup:
+                    ExecutePickup(interactionContext);
+                    return;
+                case InteractionType.Drop:
+                    ExecuteDrop(interactionContext);
+                    return;
+                case InteractionType.Attach:
+                    ExecuteAttach(interactionContext);
+                    return;
+            }
+        }
+        
+        #endregion
+        
         #region Pickup
         
-        public void ExecutePickup(InteractionContext context)
+        private void ExecutePickup(InteractionContext context)
         {
             IInventoryItem item = context.WorldInteractable as IInventoryItem; 
             _inventory.AddItem(item);
@@ -54,7 +76,7 @@ namespace NewInteractionSystem
         
         #region Drop
 
-        public void ExecuteDrop(InteractionContext context)
+        private void ExecuteDrop(InteractionContext context)
         {
             int slot = _inventory.CurrentInventoryIndex;
             _inventory.RemoveCarryObject(slot);
@@ -69,6 +91,32 @@ namespace NewInteractionSystem
         }
         
         #endregion
+        
+        #region Attach
+
+        //TODO: This is very similar to Drop, so they can be combined. Maybe with overload methods
+        private void ExecuteAttach(InteractionContext context)
+        {
+            Transform attachTransform = InventoryHelper.ItemObject(context.WorldInteractable).transform;
+            Vector3 attachPosition = attachTransform.position;
+            
+            int slot = _inventory.CurrentInventoryIndex;
+            _inventory.RemoveCarryObject(slot);
+            
+            GameObject dropObject = _inventory.InventoryObjects[slot];
+            _inventory.RemoveItem(slot);
+            
+            dropObject.transform.SetParent(attachTransform);
+            dropObject.transform.position = attachPosition;
+            dropObject.transform.rotation = attachTransform.rotation;
+            dropObject.SetActive(true);
+            
+            (context.InventoryInteractable as IAttachable).Attach(context);
+            (context.WorldInteractable as ISocket).ReceiveAttachable(context);
+        }
+        
+        #endregion
+        
         
         #endregion
     }

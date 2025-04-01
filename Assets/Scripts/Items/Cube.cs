@@ -3,7 +3,7 @@ using InventorySystem;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IInventoryItem, IDropable
+public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IInventoryItem, IDropable, IAttachable
 {
     [SerializeField] private GameObject _inventoryPrefab;
     [field: SerializeField] public string Name;
@@ -22,5 +22,10 @@ public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IIn
     public GameObject GetInventoryPrefab()
     {
         return _inventoryPrefab;
+    }
+
+    public void Attach(InteractionContext context)
+    {
+        Debug.Log("Cube successfully attached");
     }
 }
