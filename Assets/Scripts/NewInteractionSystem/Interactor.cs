@@ -121,10 +121,7 @@ namespace NewInteractionSystem
         {
             IInventoryItem currentItem = _inventory.CurrentInventoryItem;
            
-            Debug.Log($"before setting: {_inventoryInteractable}");
             _inventoryInteractable = currentItem as IInteractable;
-            Debug.Log($"after setting: {_inventoryInteractable}");
-            Debug.Log($"List has {_inventoryInteractableTypes.Count} elements");
             
             if (currentItem is IDropable) _inventoryInteractableTypes.Add(InteractableType.Dropable);
             if (currentItem is IAttachable) _inventoryInteractableTypes.Add(InteractableType.Attachable);
@@ -220,18 +217,17 @@ namespace NewInteractionSystem
             
             if (CurrentInteractionContext.PrimaryInteraction == InteractionType.Pickup)
             {
-                if (_inventory.CurrentInventoryItem == null && CurrentInteractionContext.WorldInteractable is IInventoryItem)
-                {
-                    _executer.ExecutePickup(CurrentInteractionContext);
-                }
+                _executer.ExecutePickup(CurrentInteractionContext);
             }
 
             if (CurrentInteractionContext.PrimaryInteraction == InteractionType.Drop)
             {
-                if (_inventory.CurrentInventoryItem != null && CurrentInteractionContext.WorldInteractable == null)
-                {
-                    _executer.ExecuteDrop(CurrentInteractionContext);
-                }
+                _executer.ExecuteDrop(CurrentInteractionContext);
+            }
+
+            if (CurrentInteractionContext.PrimaryInteraction == InteractionType.Attach)
+            {
+                
             }
         }
 
