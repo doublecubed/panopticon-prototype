@@ -49,6 +49,10 @@ MonoBehaviour:
   _inventoryPrefab: {fileID: 5281724417702848636, guid: 6da086bde8b8d744f8c76658eaf84247, type: 3}
   Name: Cube
   Icon: {fileID: 21300000, guid: 194efa4d421c7574db5640943cb6d41d, type: 3}
+  _interactions:
+  - {fileID: 11400000, guid: 22e599c3c07bf1242b7ba8d14eb3a8f7, type: 2}
+  - {fileID: 11400000, guid: 4ba9e296576e4094f94257c2af1c924d, type: 2}
+  - {fileID: 11400000, guid: a460c9dc89b5ddb4c82c02a4cb32b5d2, type: 2}
 --- !u!65 &3883447136919981812
 BoxCollider:
   m_ObjectHideFlags: 0

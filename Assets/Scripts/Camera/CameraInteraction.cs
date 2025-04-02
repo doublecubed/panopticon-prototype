@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using InventorySystem;using UnityEngine;
 using InteractionSystem;
 
@@ -6,6 +7,8 @@ public class CameraInteraction : MonoBehaviour,  IInventoryItem, IInteractable, 
     [SerializeField] private string _name;
     [SerializeField] private Sprite _sprite;
     [SerializeField] private GameObject _prefab;
+
+    [SerializeField] private List<Interaction> _interactions;
     
     private CameraAngleAdjuster _angleAdjuster;
     private CameraModuleCanvas _moduleCanvas;
@@ -23,6 +26,11 @@ public class CameraInteraction : MonoBehaviour,  IInventoryItem, IInteractable, 
     public string GetItemName()
     {
         return _name;
+    }
+
+    public List<Interaction> GetInteractions()
+    {
+        return _interactions;
     }
 
     public void Activate(InteractionContext context)

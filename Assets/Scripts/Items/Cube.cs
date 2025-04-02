@@ -7,11 +7,18 @@ public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IIn
 {
     [SerializeField] private GameObject _inventoryPrefab;
     [field: SerializeField] public string Name;
-    [field: SerializeField] public Sprite Icon; 
+    [field: SerializeField] public Sprite Icon;
+
+    [SerializeField] private List<Interaction> _interactions; 
     
     public string GetItemName()
     {
         return Name;
+    }
+
+    public List<Interaction> GetInteractions()
+    {
+        return _interactions;
     }
 
     public Sprite GetIcon()

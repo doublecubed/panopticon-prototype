@@ -39,6 +39,13 @@ namespace InteractionSystem
         }
     }
 
+    public enum InteractionCategory
+    {
+        Primary,        // physical interactions like pickup, drop, attach
+        Secondary,      // use-based interactions like use, activate, apply
+        Tetriary        // reserved for a third button. May be contextual
+    }
+    
     public enum InteractionType
     {
         None,
