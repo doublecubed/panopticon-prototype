@@ -1,4 +1,4 @@
-using NewInteractionSystem;
+using InteractionSystem;
 using InventorySystem;
 using System.Collections.Generic;
 using UnityEngine;

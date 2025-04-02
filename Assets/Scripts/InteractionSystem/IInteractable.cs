@@ -1,4 +1,4 @@
-namespace NewInteractionSystem
+namespace InteractionSystem
 {
     public interface IInteractable
     {

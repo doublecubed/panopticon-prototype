@@ -4,6 +4,10 @@ namespace InteractionSystem
 {
     public interface ISocket
     {
-        public bool CanReceive(IAttachable attachable, InteractionContext context);
+        public bool CanReceiveAttachable(InteractionContext context);
+
+        public Transform AttachmentPoint();
+        
+        public void ReceiveAttachable(InteractionContext context);
     }
 }

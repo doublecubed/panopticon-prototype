@@ -1,10 +1,11 @@
-using System;
-using Cinemachine;
-using UnityEngine;
-using UnityEngine.Serialization;
+using InventorySystem;using UnityEngine;
+using InteractionSystem;
 
-public class CameraInteraction : MonoBehaviour
+public class CameraInteraction : MonoBehaviour,  IInventoryItem, IInteractable, IPickupable, IDropable, IActivatable
 {
+    [SerializeField] private string _name;
+    [SerializeField] private Sprite _sprite;
+    [SerializeField] private GameObject _prefab;
     
     private CameraAngleAdjuster _angleAdjuster;
     private CameraModuleCanvas _moduleCanvas;
@@ -19,5 +20,25 @@ public class CameraInteraction : MonoBehaviour
     }
 
 
+    public string GetItemName()
+    {
+        return _name;
+    }
 
+    public void Activate(InteractionContext context)
+    {
+        if (!AdjustmentActive) _angleAdjuster.Activate();
+        else _angleAdjuster.Deactivate();
+        AdjustmentActive = !AdjustmentActive;
+    }
+
+    public Sprite GetIcon()
+    {
+        return _sprite;
+    }
+
+    public GameObject GetInventoryPrefab()
+    {
+        return _prefab;
+    }
 }

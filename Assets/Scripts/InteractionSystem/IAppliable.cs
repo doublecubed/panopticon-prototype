@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace NewInteractionSystem
+namespace InteractionSystem
 {
     public interface IAppliable
     {

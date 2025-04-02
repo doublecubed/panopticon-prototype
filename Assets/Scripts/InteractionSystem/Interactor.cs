@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
-namespace NewInteractionSystem
+namespace InteractionSystem
 {
     public class Interactor : MonoBehaviour
     {

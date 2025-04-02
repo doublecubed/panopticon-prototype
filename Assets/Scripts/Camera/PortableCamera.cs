@@ -34,6 +34,8 @@ public class PortableCamera : MonoBehaviour
     private void Start()
     {
         TurnOn();
+        _cameraCentral = FindFirstObjectByType<CameraCentral>();
+        _cameraCentral.AddCamera(this);
     }
 
     #endregion

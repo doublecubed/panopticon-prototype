@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NewInteractionSystem
+namespace InteractionSystem
 {
     public static class InteractionHelper
     {

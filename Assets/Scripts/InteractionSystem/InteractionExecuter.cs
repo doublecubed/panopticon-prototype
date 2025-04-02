@@ -2,7 +2,7 @@ using System;
 using InventorySystem;
 using UnityEngine;
 
-namespace NewInteractionSystem
+namespace InteractionSystem
 { 
     public class InteractionExecuter : MonoBehaviour
     {

@@ -1,5 +1,5 @@
 using UnityEngine;
-using NewInteractionSystem;
+using InteractionSystem;
 using InventorySystem;
 
 public class CubeSocket : MonoBehaviour, IInteractable, ISocket

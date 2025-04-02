@@ -1,4 +1,4 @@
-using NewInteractionSystem;
+using InteractionSystem;
 using UnityEngine;
 
 namespace InventorySystem

@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using InteractionSystem;
 using UnityEngine.Serialization;
 
-public class InputController : MonoBehaviour, IInteractionInputControl
+public class InputController : MonoBehaviour
 {
     public static InputController Instance;
 
