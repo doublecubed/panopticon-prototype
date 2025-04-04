@@ -16,7 +16,7 @@ namespace InteractionSystem
         public bool RequiresInWorld;
 
         public InteractionCategory Category; // primary, secondary, tetriary etc
-        public InteractionTargeting InteractionTargeting;
+        public InteractionTargeting Targeting;
         
         public bool VicinityBased;
         public float InteractionDistance; // zero or infinity means no distance needed

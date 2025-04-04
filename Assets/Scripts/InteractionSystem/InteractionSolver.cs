@@ -24,6 +24,8 @@ namespace InteractionSystem
         private Dictionary<IInteractor, Dictionary<InteractionCategory, List<InteractionProspect>>>
             _categorizedProspects;
         
+        
+        
         #endregion
         
         #region VARIABLES
@@ -47,8 +49,6 @@ namespace InteractionSystem
             InitializeDictionaries();
         }
 
-        #endregion
-
         private void Update()
         {
             DGProfiler.BeginScope(this, "Performance");
@@ -64,15 +64,18 @@ namespace InteractionSystem
             CreateProspects();
             EliminateProspects();
             CategorizeProspects();
-            SortProspectsForPriority();
+            OrderProspectsForPriority();
             
             DGProfiler.EndScope();
+            
             //Cast for the top prospects (if necessary), move down if not viable
             //Combine the first viable ones into one final InteractionSet
 
 
         }
 
+        #endregion
+        
         #region METHODS
 
         #region Initialization & Registering
@@ -249,7 +252,7 @@ namespace InteractionSystem
         }
 
         // TODO: sorting can be done using enums and dictionaries, but handworld, handonly and worldonly are not types yet.
-        private void SortProspectsForPriority()
+        private void OrderProspectsForPriority()
         {
             foreach (IInteractor interactor in _interactors)
             {
@@ -258,6 +261,42 @@ namespace InteractionSystem
                     _categorizedProspects[interactor][category] = _categorizedProspects[interactor][category].OrderBy(x => InteractionPriority(x.Interaction)).ToList();
                 }
             }
+        }
+        
+        #endregion
+        
+        #region Casting
+
+        private void CastForProspects()
+        {
+            foreach (IInteractor interactor in _interactors)
+            {
+                foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
+                {
+                    List<InteractionProspect> prospectList = _categorizedProspects[interactor][category];
+                    
+                    if (prospectList.Count == 0) continue;
+                    for (int i = 0; i < prospectList.Count; i++)
+                    {
+                        Interaction interaction = prospectList[i].Interaction;
+
+                        switch (interaction.Targeting)
+                        {
+                            case InteractionTargeting.Raycast:
+                                break;
+                            case InteractionTargeting.Spherecast:
+                                break;
+                            case InteractionTargeting.Vicinity:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void RaycastForProspect(InteractionProspect prospect)
+        {
+            
         }
         
         #endregion
@@ -331,7 +370,7 @@ namespace InteractionSystem
                 typePriority = WorldOnlyPriority;
 
             int castPriority = 0;
-            switch (interaction.InteractionTargeting)
+            switch (interaction.Targeting)
             {
                 case InteractionTargeting.Raycast:
                     castPriority = RaycastPriority;
@@ -369,7 +408,7 @@ namespace InteractionSystem
 
     public struct NewInteractionContext
     {
-        public NewInteractionContext(Interactor interactor, Interaction interaction, 
+        public NewInteractionContext(IInteractor interactor, Interaction interaction, 
             IInteractable hand = null, IInteractable world = null, 
             RaycastHit hit = new RaycastHit())
         {
@@ -381,9 +420,19 @@ namespace InteractionSystem
         }
 
         public Interaction Interaction;
-        public Interactor Interactor;
+        public IInteractor Interactor;
         public IInteractable HandInteractable;
         public IInteractable WorldInteractable;
         public RaycastHit Hit;
+    }
+
+    public struct InteractionSet
+    {
+        public InteractionSet(Dictionary<InteractionCategory, InteractionContext> interactionContexts)
+        {
+            Interactions = interactionContexts;
+        }
+        
+        public Dictionary<InteractionCategory, InteractionContext> Interactions;
     }
 }

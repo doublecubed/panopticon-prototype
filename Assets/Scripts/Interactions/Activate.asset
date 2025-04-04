@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 062401cf2f819624fa38bd50b89bc24d, type: 3}
-  m_Name: Use
+  m_Name: Activate
   m_EditorClassIdentifier: 
-  Name: Use
-  Description: use an item
+  Name: Activate
+  Description: activate large objects
   Icon: {fileID: 21300000, guid: 9a67e6afe1cff7b4a84fc30e780fea5d, type: 3}
-  Prompt: Use
-  RequiresInHand: 1
-  RequiresInWorld: 0
-  Category: 1
-  InteractionTargeting: 0
+  Prompt: Activate
+  RequiresInHand: 0
+  RequiresInWorld: 1
+  Category: 0
+  targeting: 0
   VicinityBased: 0
-  InteractionDistance: 0
+  InteractionDistance: 3
   InteractionRadius: 0
