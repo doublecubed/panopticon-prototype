@@ -6,5 +6,7 @@ namespace InteractionSystem
     {
         public string GetItemName();
         public List<Interaction> GetInteractions();
+
+        
     }
 }

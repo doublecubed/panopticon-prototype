@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 062401cf2f819624fa38bd50b89bc24d, type: 3}
   m_Name: Attach
   m_EditorClassIdentifier: 
-  Name: 
-  Description: 
-  Icon: {fileID: 0}
-  Prompt: 
-  Holding: 0
-  LookingAt: 0
+  Name: Attach
+  Description: Attach one object to another
+  Icon: {fileID: 21300000, guid: 9a67e6afe1cff7b4a84fc30e780fea5d, type: 3}
+  Prompt: Attach
+  Holding: 1
+  LookingAt: 1
   InteractionType: 0
-  InteractionDistance: 0
+  InteractionDistance: 3
   InteractionRadius: 0

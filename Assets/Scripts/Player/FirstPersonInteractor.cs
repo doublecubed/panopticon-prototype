@@ -41,6 +41,11 @@ public class FirstPersonInteractor : MonoBehaviour, IInteractor
     {
         return transform.position;
     }
+
+    public Vector3 GetLookDirection()
+    {
+        return transform.forward;
+    }
     
     public Ray LookRay()
     {

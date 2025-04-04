@@ -11,11 +11,13 @@ namespace InteractionSystem
         public Sprite Icon; // optional, might be needed
         public string Prompt; // to be displayed on the HUD
 
-        public bool Holding;
-        public bool LookingAt;
+        public bool RequiresInHand;
+        public bool RequiresInWorld;
 
         public InteractionCategory InteractionType; // primary, secondary, tetriary etc
-
+        public InteractionTargeting InteractionTargeting;
+        
+        public bool VicinityBased;
         public float InteractionDistance; // zero or infinity means no distance needed
         public float InteractionRadius; // zero means raycast, positive value means spherecast
     }

@@ -56,6 +56,13 @@ namespace InteractionSystem
         Activate,
         Apply
     }
+
+    public enum InteractionTargeting
+    {
+        Raycast,
+        Spherecast,
+        Vicinity
+    }
     
     public enum InteractableType
     {
