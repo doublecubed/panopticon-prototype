@@ -283,6 +283,7 @@ namespace InteractionSystem
                         switch (interaction.Targeting)
                         {
                             case InteractionTargeting.Raycast:
+                                RaycastForProspect(interactor, prospectList[i]);
                                 break;
                             case InteractionTargeting.Spherecast:
                                 break;
@@ -294,9 +295,13 @@ namespace InteractionSystem
             }
         }
 
-        private void RaycastForProspect(InteractionProspect prospect)
+        private void RaycastForProspect(IInteractor interactor, InteractionProspect prospect)
         {
-            
+            Ray castingRay = interactor.LookRay();
+            if (Physics.Raycast(castingRay, out RaycastHit hit, MaxDetectionDistance))
+            {
+                
+            }
         }
         
         #endregion
