@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DeificGames.Profiler;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -19,6 +20,9 @@ namespace InteractionSystem
         private Dictionary<IInteractor, List<Interaction>> _worldInteractions;
 
         private Dictionary<IInteractor, List<InteractionProspect>> _prospects;
+
+        private Dictionary<IInteractor, Dictionary<InteractionCategory, List<InteractionProspect>>>
+            _categorizedProspects;
         
         #endregion
         
@@ -26,6 +30,14 @@ namespace InteractionSystem
         
         [field: SerializeField] public float MaxDetectionDistance { get; private set; }
         [field: SerializeField] public float DetectionAngle { get; private set; }
+
+        private const int HandWorldPriority = 30;
+        private const int HandOnlyPriority = -30;
+        private const int WorldOnlyPriority = 10;
+        private const int RaycastPriority = 40;
+        private const int SpherecastPriority = 30;
+        private const int VicinityPriority = 5;
+        
         #endregion
         
         #region MONOBEHAVIOUR
@@ -35,8 +47,12 @@ namespace InteractionSystem
             InitializeDictionaries();
         }
 
+        #endregion
+
         private void Update()
         {
+            DGProfiler.BeginScope(this, "Performance");
+            
             ResetDictionaries();
             GetInteractablesInHand();
             DetectInteractablesInWorld();
@@ -47,27 +63,16 @@ namespace InteractionSystem
             
             CreateProspects();
             EliminateProspects();
+            CategorizeProspects();
+            SortProspectsForPriority();
             
-            Debug.Log($"There are {_prospects[_interactors[0]].Count} prospects");
-            foreach (InteractionProspect prospect in _prospects[_interactors[0]])
-            {
-                Debug.Log($"Interaction: {prospect.Interaction.Name}");
-                Debug.Log($"Hand Interactable: {prospect.HandInteractable}");
-                Debug.Log($"World Interactable: {prospect.WorldInteractable}");
-                
-            }
-            
-            //Eliminate prospects based on viability (distance, angle etc)
-            //Sort prospects into categories (primary, secondary, tetriary)
-            //Sort categories for priority
+            DGProfiler.EndScope();
             //Cast for the top prospects (if necessary), move down if not viable
             //Combine the first viable ones into one final InteractionSet
 
 
         }
 
-        #endregion
-        
         #region METHODS
 
         #region Initialization & Registering
@@ -80,8 +85,11 @@ namespace InteractionSystem
             _handInteractions = new Dictionary<IInteractor, List<Interaction>>();
             _worldInteractions = new Dictionary<IInteractor, List<Interaction>>();
             _prospects = new Dictionary<IInteractor, List<InteractionProspect>>();
+            
+            _categorizedProspects = new Dictionary<IInteractor, Dictionary<InteractionCategory, List<InteractionProspect>>>();
         }
 
+        
         private void ResetDictionaries()
         {
             foreach (IInteractor interactor in _interactors)
@@ -91,6 +99,13 @@ namespace InteractionSystem
                 _handInteractions[interactor] = new List<Interaction>();
                 _worldInteractions[interactor] = new List<Interaction>();
                 _prospects[interactor] = new List<InteractionProspect>();
+                
+                var categorized = new Dictionary<InteractionCategory, List<InteractionProspect>>();
+                foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
+                {
+                    categorized[category] = new List<InteractionProspect>();
+                }
+                _categorizedProspects[interactor] = categorized;
             }
         }
         
@@ -220,6 +235,30 @@ namespace InteractionSystem
                 }
             }
         }
+
+        private void CategorizeProspects()
+        {
+            foreach (IInteractor interactor in _interactors)
+            {
+                foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
+                {
+                    _categorizedProspects[interactor][category] = 
+                        _prospects[interactor].Where(prospect => prospect.Interaction.Category == category).ToList();
+                }
+            }
+        }
+
+        // TODO: sorting can be done using enums and dictionaries, but handworld, handonly and worldonly are not types yet.
+        private void SortProspectsForPriority()
+        {
+            foreach (IInteractor interactor in _interactors)
+            {
+                foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
+                {
+                    _categorizedProspects[interactor][category] = _categorizedProspects[interactor][category].OrderBy(x => InteractionPriority(x.Interaction)).ToList();
+                }
+            }
+        }
         
         #endregion
         
@@ -279,6 +318,33 @@ namespace InteractionSystem
             Vector3 interactableDirection = interactablePosition - interactorPosition;
             
             return Vector3.Angle(interactorDirection, interactableDirection);
+        }
+
+        private int InteractionPriority(Interaction interaction)
+        {
+            int typePriority = 0;
+            if (interaction.RequiresInHand && interaction.RequiresInWorld)
+                typePriority = HandWorldPriority;
+            if (interaction.RequiresInHand && !interaction.RequiresInWorld)
+                typePriority = HandOnlyPriority;
+            if (!interaction.RequiresInHand && interaction.RequiresInWorld)
+                typePriority = WorldOnlyPriority;
+
+            int castPriority = 0;
+            switch (interaction.InteractionTargeting)
+            {
+                case InteractionTargeting.Raycast:
+                    castPriority = RaycastPriority;
+                    break;
+                case InteractionTargeting.Spherecast:
+                    castPriority = SpherecastPriority;
+                    break;
+                case InteractionTargeting.Vicinity:
+                    castPriority = VicinityPriority;
+                    break;
+            }
+            
+            return typePriority + castPriority;
         }
         
         #endregion

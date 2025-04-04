@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace InteractionSystem
 {
@@ -14,7 +15,7 @@ namespace InteractionSystem
         public bool RequiresInHand;
         public bool RequiresInWorld;
 
-        public InteractionCategory InteractionType; // primary, secondary, tetriary etc
+        public InteractionCategory Category; // primary, secondary, tetriary etc
         public InteractionTargeting InteractionTargeting;
         
         public bool VicinityBased;
