@@ -4,11 +4,15 @@ using System.Linq;
 using DeificGames.Profiler;
 using Unity.VisualScripting;
 using UnityEngine;
+using TMPro;
 
 namespace InteractionSystem
 {
     public class InteractionSolver : MonoBehaviour
     {
+        // Temporary Reference
+        public TMP_Text OutputText;
+        
         #region REFERENCES
         
         private List<IInteractor> _interactors;
@@ -287,21 +291,23 @@ namespace InteractionSystem
                             case InteractionTargeting.Raycast:
                                 if (RaycastForProspect(interactor, prospectList[i], out RaycastHit raycastHit))
                                 {
-                                    Debug.Log($"Raycast successful.");
-                                    Debug.Log($"Hand item: {prospectList[i].HandInteractable}");
-                                    Debug.Log($"World item: {raycastHit.transform.name}");
+                                    OutputText.text = $"{interaction.Name}\nRaycast:\n " +
+                                                      $"Hand item: {prospectList[i].HandInteractable}\n" +
+                                                      $"World item: {raycastHit.transform.name}";
                                 }
                                 break;
                             case InteractionTargeting.Spherecast:
                                 if (SpherecastForProspect(interactor, prospectList[i], out RaycastHit spherecastHit))
                                 {
-                                    Debug.Log($"Spherecast successful.");
-                                    Debug.Log($"Hand item: {prospectList[i].HandInteractable}");
-                                    Debug.Log($"World item: {spherecastHit.transform.name}");
+                                    OutputText.text = $"{interaction.Name}\nSpherecast:\n" +
+                                                      $"Hand item: {prospectList[i].HandInteractable}\n" +
+                                                      $"World item: {spherecastHit.transform.name}";
                                 }
                                 break;
                             case InteractionTargeting.Vicinity:
-                                Debug.Log("vicinity successul");
+                                OutputText.text = $"{interaction.Name}\nVicinity:\n" +
+                                                  $"Hand item: {prospectList[i].HandInteractable}\n" +
+                                                  $"World item: {prospectList[i].WorldInteractable}";
                                 break;
                         }
                     }

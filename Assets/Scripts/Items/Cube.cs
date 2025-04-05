@@ -3,7 +3,7 @@ using InventorySystem;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IInventoryItem, IDropable, IAttachable, IUseable
+public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IInventoryItem, IDropable, IAttachable, IUseable, IReceiver
 {
     [SerializeField] private GameObject _inventoryPrefab;
     [field: SerializeField] public string Name;
@@ -19,6 +19,13 @@ public class Cube : MonoBehaviour, IInteractable, IPickupable, IActivatable, IIn
     public List<Interaction> GetInteractions()
     {
         return _interactions;
+    }
+
+    public bool CanInteractWith(Interaction interaction, IInteractable interactable)
+    {
+        Component comp = interactable as Component;
+        if (comp == null) return false;
+        return true;
     }
 
     public Sprite GetIcon()
