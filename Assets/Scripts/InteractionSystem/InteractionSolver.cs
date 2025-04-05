@@ -66,6 +66,8 @@ namespace InteractionSystem
             CategorizeProspects();
             OrderProspectsForPriority();
             
+            CastForProspects();
+            
             DGProfiler.EndScope();
             
             //Cast for the top prospects (if necessary), move down if not viable
@@ -283,7 +285,12 @@ namespace InteractionSystem
                         switch (interaction.Targeting)
                         {
                             case InteractionTargeting.Raycast:
-                                RaycastForProspect(interactor, prospectList[i]);
+                                if (RaycastForProspect(interactor, prospectList[i], out RaycastHit hit))
+                                {
+                                    Debug.Log($"Cast successful.");
+                                    Debug.Log($"Hand item: {prospectList[i].HandInteractable}");
+                                    Debug.Log($"World item: {hit.transform.name}");
+                                }
                                 break;
                             case InteractionTargeting.Spherecast:
                                 break;
@@ -295,13 +302,38 @@ namespace InteractionSystem
             }
         }
 
-        private void RaycastForProspect(IInteractor interactor, InteractionProspect prospect)
+        // TODO: No-range interaction (like use) should have its own case. This is wacky at best
+        private bool RaycastForProspect(IInteractor interactor, InteractionProspect prospect, out RaycastHit hitResult)
         {
+            Interaction interaction = prospect.Interaction;
+
+            if (interaction.InteractionDistance <= 0)
+            {
+                hitResult = new RaycastHit();
+                return true;
+            }
+            
             Ray castingRay = interactor.LookRay();
             if (Physics.Raycast(castingRay, out RaycastHit hit, MaxDetectionDistance))
             {
+                hitResult = hit;
+                if (hit.distance > interaction.InteractionDistance) return false;
                 
+                if (interaction.RequiresInHand && interaction.RequiresInWorld)
+                {
+                    if (hit.transform.TryGetComponent(out IInteractable interactable) &&
+                        interactable == prospect.WorldInteractable) return true;
+                } else if (interaction.RequiresInHand)
+                {
+                    return true;
+                } else if (interaction.RequiresInWorld)
+                {
+                    if (hit.transform.TryGetComponent(out IInteractable interactable) &&
+                        interactable == prospect.WorldInteractable) return true;
+                }
             }
+            hitResult = new RaycastHit();
+            return false;
         }
         
         #endregion
