@@ -76,7 +76,7 @@ namespace InteractionSystem
             CategorizeProspects();
             OrderProspectsForPriority();
             
-            CastForProspects();
+            CreateInteractionSet();
             
             DGProfiler.EndScope();
             
@@ -349,7 +349,86 @@ namespace InteractionSystem
             }
         }
 
+        private void CreateInteractionSet()
+        {
+            foreach (IInteractor interactor in _interactors)
+            {
+                InteractionSet interactionSet = new InteractionSet();
+
+                foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
+                {
+                    List<InteractionProspect> categoryProspects = _categorizedProspects[interactor][category];
+                    if (categoryProspects.Count == 0) continue;
+
+                    bool foundValidInteraction = false;
+
+                    for (int i = 0; i < categoryProspects.Count; i++)
+                    {
+                        Interaction prospectInteraction =  categoryProspects[i].Interaction;
+
+                        if (prospectInteraction.Targeting != InteractionTargeting.Vicinity)
+                        {
+                            if (CastForProspect(interactor, categoryProspects[i], out RaycastHit castResult))
+                            {
+                                NewInteractionContext castContext =
+                                    new NewInteractionContext(interactor, prospectInteraction,
+                                        categoryProspects[i].HandInteractable, categoryProspects[i].WorldInteractable,
+                                        castResult);
+                                interactionSet.Interactions[category] = castContext;
+                                foundValidInteraction = true;
+                            }
+                        }
+                        else
+                        {
+                            NewInteractionContext vicinityContext =
+                                new NewInteractionContext(interactor, prospectInteraction,
+                                    categoryProspects[i].HandInteractable, categoryProspects[i].WorldInteractable);
+                            interactionSet.Interactions[category] = vicinityContext;
+                            foundValidInteraction = true;
+                        }
+
+                        if (foundValidInteraction) break;
+                    }
+                }
+
+                InteractionSets[interactor] = interactionSet;
+            }
+        }
+
         // TODO: No-range interaction (like use) should have its own case. This is wacky at best
+        private bool CastForProspect(IInteractor interactor, InteractionProspect prospect, out RaycastHit hitResult)
+        {
+            Interaction interaction = prospect.Interaction;
+
+            hitResult = new RaycastHit();
+            
+            if (interaction.InteractionDistance <= 0) return true;
+
+            Ray castingRay = interactor.LookRay();
+            bool hitSomething = false;
+            
+            if (interaction.Targeting == InteractionTargeting.Raycast)
+                hitSomething = Physics.Raycast(castingRay, out hitResult, MaxDetectionDistance);
+
+            else if (interaction.Targeting == InteractionTargeting.Spherecast)
+                hitSomething = Physics.SphereCast(castingRay, interaction.InteractionRadius, out hitResult, MaxDetectionDistance);
+
+            if (!hitSomething) return false;
+            
+            if (hitResult.distance > interaction.InteractionDistance) return false;
+            
+            if (!interaction.RequiresInWorld) return true;
+            
+            Component worldComponent = prospect.WorldInteractable as Component;
+            if (worldComponent != null && worldComponent.gameObject == hitResult.transform.gameObject)
+                return true;
+            
+            return false;
+        }
+        
+        
+        
+       
         private bool RaycastForProspect(IInteractor interactor, InteractionProspect prospect, out RaycastHit hitResult)
         {
             Interaction interaction = prospect.Interaction;
@@ -531,19 +610,18 @@ namespace InteractionSystem
         public RaycastHit Hit;
     }
 
-    public struct InteractionSet
+    public class InteractionSet
     {
-        public InteractionSet(Dictionary<InteractionCategory, NewInteractionContext> interactionContexts)
+        public InteractionSet()
         {
-            _interactions = interactionContexts;
+            Interactions = new Dictionary<InteractionCategory, NewInteractionContext>();
+            
+            foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
+            {
+                Interactions[category] = new NewInteractionContext();
+            }
         }
 
-        private Dictionary<InteractionCategory, NewInteractionContext> _interactions;
-
-        public Dictionary<InteractionCategory, NewInteractionContext> Interactions
-        {
-            get => _interactions ??= new Dictionary<InteractionCategory, NewInteractionContext>();
-            set => _interactions = value;
-        }
+        public Dictionary<InteractionCategory, NewInteractionContext> Interactions;
     }
 }
