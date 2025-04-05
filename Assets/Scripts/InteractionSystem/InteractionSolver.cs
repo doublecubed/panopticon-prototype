@@ -27,8 +27,14 @@ namespace InteractionSystem
 
         private Dictionary<IInteractor, Dictionary<InteractionCategory, List<InteractionProspect>>>
             _categorizedProspects;
-        
-        
+
+        public Dictionary<IInteractor, Dictionary<InteractionCategory, NewInteractionContext>> CurrentContexts
+        {
+            get;
+            private set;
+        }
+
+        public Dictionary<IInteractor, InteractionSet> InteractionSets;
         
         #endregion
         
@@ -96,6 +102,8 @@ namespace InteractionSystem
             _prospects = new Dictionary<IInteractor, List<InteractionProspect>>();
             
             _categorizedProspects = new Dictionary<IInteractor, Dictionary<InteractionCategory, List<InteractionProspect>>>();
+
+            InteractionSets = new Dictionary<IInteractor, InteractionSet>();
         }
 
         
@@ -115,6 +123,8 @@ namespace InteractionSystem
                     categorized[category] = new List<InteractionProspect>();
                 }
                 _categorizedProspects[interactor] = categorized;
+                
+                InteractionSets[interactor] = new InteractionSet(); 
             }
         }
         
@@ -277,8 +287,12 @@ namespace InteractionSystem
         {
             foreach (IInteractor interactor in _interactors)
             {
+                InteractionSet interactionSet = new InteractionSet();
+                
                 foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
                 {
+                    
+                        
                     List<InteractionProspect> prospectList = _categorizedProspects[interactor][category];
                     
                     if (prospectList.Count == 0) continue;
@@ -286,32 +300,52 @@ namespace InteractionSystem
                     {
                         Interaction interaction = prospectList[i].Interaction;
 
+                        interactionSet.Interactions[category] = new NewInteractionContext();
+                        
                         switch (interaction.Targeting)
                         {
                             case InteractionTargeting.Raycast:
                                 if (RaycastForProspect(interactor, prospectList[i], out RaycastHit raycastHit))
                                 {
-                                    OutputText.text = $"{interaction.Name}\nRaycast:\n " +
-                                                      $"Hand item: {prospectList[i].HandInteractable}\n" +
-                                                      $"World item: {raycastHit.transform.name}";
+                                    NewInteractionContext raycastContext = new NewInteractionContext(interactor,
+                                        interaction,
+                                        prospectList[i].HandInteractable, prospectList[i].WorldInteractable,
+                                        raycastHit);
+                                    interactionSet.Interactions[category] = raycastContext;
                                 }
                                 break;
                             case InteractionTargeting.Spherecast:
                                 if (SpherecastForProspect(interactor, prospectList[i], out RaycastHit spherecastHit))
                                 {
-                                    OutputText.text = $"{interaction.Name}\nSpherecast:\n" +
-                                                      $"Hand item: {prospectList[i].HandInteractable}\n" +
-                                                      $"World item: {spherecastHit.transform.name}";
+                                    NewInteractionContext spherecastContext = new NewInteractionContext(interactor,
+                                        interaction,
+                                        prospectList[i].HandInteractable, prospectList[i].WorldInteractable,
+                                        spherecastHit);
+                                    interactionSet.Interactions[category] = spherecastContext;
                                 }
                                 break;
                             case InteractionTargeting.Vicinity:
-                                OutputText.text = $"{interaction.Name}\nVicinity:\n" +
-                                                  $"Hand item: {prospectList[i].HandInteractable}\n" +
-                                                  $"World item: {prospectList[i].WorldInteractable}";
+                                NewInteractionContext categoryContext = new NewInteractionContext(interactor,
+                                    interaction,
+                                    prospectList[i].HandInteractable, prospectList[i].WorldInteractable);
+                                interactionSet.Interactions[category] = categoryContext;
                                 break;
                         }
                     }
                 }
+
+                InteractionSets[interactor] = interactionSet;
+
+                string outputText = "";
+                foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
+                {
+                    outputText += category + ":\n";
+                    outputText += "Interaction: " + InteractionSets[interactor].Interactions[category].Interaction.Name +"\n";
+                    outputText += "Hand: " + InteractionSets[interactor].Interactions[category].HandInteractable + "\n";
+                    outputText += "World: " + InteractionSets[interactor].Interactions[category].WorldInteractable + "\n";
+                }
+                
+                OutputText.text = outputText;
             }
         }
 
@@ -499,11 +533,17 @@ namespace InteractionSystem
 
     public struct InteractionSet
     {
-        public InteractionSet(Dictionary<InteractionCategory, InteractionContext> interactionContexts)
+        public InteractionSet(Dictionary<InteractionCategory, NewInteractionContext> interactionContexts)
         {
-            Interactions = interactionContexts;
+            _interactions = interactionContexts;
         }
-        
-        public Dictionary<InteractionCategory, InteractionContext> Interactions;
+
+        private Dictionary<InteractionCategory, NewInteractionContext> _interactions;
+
+        public Dictionary<InteractionCategory, NewInteractionContext> Interactions
+        {
+            get => _interactions ??= new Dictionary<InteractionCategory, NewInteractionContext>();
+            set => _interactions = value;
+        }
     }
 }
