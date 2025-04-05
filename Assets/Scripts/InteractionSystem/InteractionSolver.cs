@@ -285,16 +285,23 @@ namespace InteractionSystem
                         switch (interaction.Targeting)
                         {
                             case InteractionTargeting.Raycast:
-                                if (RaycastForProspect(interactor, prospectList[i], out RaycastHit hit))
+                                if (RaycastForProspect(interactor, prospectList[i], out RaycastHit raycastHit))
                                 {
-                                    Debug.Log($"Cast successful.");
+                                    Debug.Log($"Raycast successful.");
                                     Debug.Log($"Hand item: {prospectList[i].HandInteractable}");
-                                    Debug.Log($"World item: {hit.transform.name}");
+                                    Debug.Log($"World item: {raycastHit.transform.name}");
                                 }
                                 break;
                             case InteractionTargeting.Spherecast:
+                                if (SpherecastForProspect(interactor, prospectList[i], out RaycastHit spherecastHit))
+                                {
+                                    Debug.Log($"Spherecast successful.");
+                                    Debug.Log($"Hand item: {prospectList[i].HandInteractable}");
+                                    Debug.Log($"World item: {spherecastHit.transform.name}");
+                                }
                                 break;
                             case InteractionTargeting.Vicinity:
+                                Debug.Log("vicinity successul");
                                 break;
                         }
                     }
@@ -307,32 +314,53 @@ namespace InteractionSystem
         {
             Interaction interaction = prospect.Interaction;
 
-            if (interaction.InteractionDistance <= 0)
-            {
-                hitResult = new RaycastHit();
-                return true;
-            }
+            // for the negative results.
+            hitResult = new RaycastHit();
+            
+            // This is only possible for self-use items in hand. Not an elegant solution. Must change
+            if (interaction.InteractionDistance <= 0) return true;
             
             Ray castingRay = interactor.LookRay();
             if (Physics.Raycast(castingRay, out RaycastHit hit, MaxDetectionDistance))
             {
                 hitResult = hit;
                 if (hit.distance > interaction.InteractionDistance) return false;
-                
-                if (interaction.RequiresInHand && interaction.RequiresInWorld)
-                {
-                    if (hit.transform.TryGetComponent(out IInteractable interactable) &&
-                        interactable == prospect.WorldInteractable) return true;
-                } else if (interaction.RequiresInHand)
-                {
+
+                if (!interaction.RequiresInWorld) return true;
+
+                Component worldComponent = prospect.WorldInteractable as Component;
+                if (worldComponent != null && worldComponent.gameObject == hit.transform.gameObject)
                     return true;
-                } else if (interaction.RequiresInWorld)
-                {
-                    if (hit.transform.TryGetComponent(out IInteractable interactable) &&
-                        interactable == prospect.WorldInteractable) return true;
-                }
             }
+            
+            return false;
+        }
+
+        // Practically same code as raycast. They can be combined
+        private bool SpherecastForProspect(IInteractor interactor, InteractionProspect prospect,
+            out RaycastHit hitResult)
+        {
+            Interaction interaction = prospect.Interaction;
+
+            // for the negative results.
             hitResult = new RaycastHit();
+            
+            // This is only possible for self-use items in hand. Not an elegant solution. Must change
+            if (interaction.InteractionDistance <= 0) return true;
+            
+            Ray castingRay = interactor.LookRay();
+            if (Physics.SphereCast(castingRay, interaction.InteractionRadius, out RaycastHit hit, MaxDetectionDistance))
+            {
+                hitResult = hit;
+                if (hit.distance > interaction.InteractionDistance) return false;
+
+                if (!interaction.RequiresInWorld) return true;
+
+                Component worldComponent = prospect.WorldInteractable as Component;
+                if (worldComponent != null && worldComponent.gameObject == hit.transform.gameObject)
+                    return true;
+            }
+            
             return false;
         }
         
