@@ -28,7 +28,7 @@ namespace InteractionSystem
         private Dictionary<IInteractor, Dictionary<InteractionCategory, List<InteractionProspect>>>
             _categorizedProspects;
 
-        public Dictionary<IInteractor, Dictionary<InteractionCategory, NewInteractionContext>> CurrentContexts
+        public Dictionary<IInteractor, Dictionary<InteractionCategory, InteractionContext>> CurrentContexts
         {
             get;
             private set;
@@ -300,14 +300,14 @@ namespace InteractionSystem
                     {
                         Interaction interaction = prospectList[i].Interaction;
 
-                        interactionSet.Interactions[category] = new NewInteractionContext();
+                        interactionSet.Interactions[category] = new InteractionContext();
                         
                         switch (interaction.Targeting)
                         {
                             case InteractionTargeting.Raycast:
                                 if (RaycastForProspect(interactor, prospectList[i], out RaycastHit raycastHit))
                                 {
-                                    NewInteractionContext raycastContext = new NewInteractionContext(interactor,
+                                    InteractionContext raycastContext = new InteractionContext(interactor,
                                         interaction,
                                         prospectList[i].HandInteractable, prospectList[i].WorldInteractable,
                                         raycastHit);
@@ -317,7 +317,7 @@ namespace InteractionSystem
                             case InteractionTargeting.Spherecast:
                                 if (SpherecastForProspect(interactor, prospectList[i], out RaycastHit spherecastHit))
                                 {
-                                    NewInteractionContext spherecastContext = new NewInteractionContext(interactor,
+                                    InteractionContext spherecastContext = new InteractionContext(interactor,
                                         interaction,
                                         prospectList[i].HandInteractable, prospectList[i].WorldInteractable,
                                         spherecastHit);
@@ -325,7 +325,7 @@ namespace InteractionSystem
                                 }
                                 break;
                             case InteractionTargeting.Vicinity:
-                                NewInteractionContext categoryContext = new NewInteractionContext(interactor,
+                                InteractionContext categoryContext = new InteractionContext(interactor,
                                     interaction,
                                     prospectList[i].HandInteractable, prospectList[i].WorldInteractable);
                                 interactionSet.Interactions[category] = categoryContext;
@@ -370,8 +370,8 @@ namespace InteractionSystem
                         {
                             if (CastForProspect(interactor, categoryProspects[i], out RaycastHit castResult))
                             {
-                                NewInteractionContext castContext =
-                                    new NewInteractionContext(interactor, prospectInteraction,
+                                InteractionContext castContext =
+                                    new InteractionContext(interactor, prospectInteraction,
                                         categoryProspects[i].HandInteractable, categoryProspects[i].WorldInteractable,
                                         castResult);
                                 interactionSet.Interactions[category] = castContext;
@@ -380,8 +380,8 @@ namespace InteractionSystem
                         }
                         else
                         {
-                            NewInteractionContext vicinityContext =
-                                new NewInteractionContext(interactor, prospectInteraction,
+                            InteractionContext vicinityContext =
+                                new InteractionContext(interactor, prospectInteraction,
                                     categoryProspects[i].HandInteractable, categoryProspects[i].WorldInteractable);
                             interactionSet.Interactions[category] = vicinityContext;
                             foundValidInteraction = true;
@@ -586,55 +586,5 @@ namespace InteractionSystem
         #endregion
         
         #endregion
-    }
-
-    public struct InteractionProspect
-    {
-        public InteractionProspect(Interaction interaction, IInteractable hand = null, 
-            IInteractable world = null)
-        {
-            Interaction = interaction;
-            HandInteractable = hand;
-            WorldInteractable = world;
-        }
-        
-        public Interaction Interaction;
-        public IInteractable HandInteractable;
-        public IInteractable WorldInteractable;
-    }
-
-    public struct NewInteractionContext
-    {
-        public NewInteractionContext(IInteractor interactor, Interaction interaction, 
-            IInteractable hand = null, IInteractable world = null, 
-            RaycastHit hit = new RaycastHit())
-        {
-            Interactor = interactor;
-            Interaction = interaction;
-            HandInteractable = hand;
-            WorldInteractable = world;
-            Hit = hit;
-        }
-
-        public Interaction Interaction;
-        public IInteractor Interactor;
-        public IInteractable HandInteractable;
-        public IInteractable WorldInteractable;
-        public RaycastHit Hit;
-    }
-
-    public class InteractionSet
-    {
-        public InteractionSet()
-        {
-            Interactions = new Dictionary<InteractionCategory, NewInteractionContext>();
-            
-            foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
-            {
-                Interactions[category] = new NewInteractionContext();
-            }
-        }
-
-        public Dictionary<InteractionCategory, NewInteractionContext> Interactions;
     }
 }

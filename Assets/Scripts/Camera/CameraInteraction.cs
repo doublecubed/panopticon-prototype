@@ -33,6 +33,11 @@ public class CameraInteraction : MonoBehaviour,  IInventoryItem, IInteractable
         return _interactions;
     }
 
+    public void Interact(InteractionContext context)
+    {
+        Debug.Log("Interacted");
+    }
+
     public Sprite GetIcon()
     {
         return _sprite;

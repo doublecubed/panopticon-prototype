@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,37 +7,8 @@ namespace InteractionSystem
 {
     public static class InteractionHelper
     {
-        public static InteractionType CanInteractPrimary(List<InteractableType> inventory, List<InteractableType> world)
-        {
-            if (inventory.Contains(InteractableType.Dropable) && world.Count == 0)
-            {
-                return InteractionType.Drop;                
-            }
-
-            if (inventory.Count == 0 && world.Contains(InteractableType.Pickupable))
-            {
-                return InteractionType.Pickup;                
-            }
-
-            if (inventory.Contains(InteractableType.Attachable) && world.Contains(InteractableType.Socket))
-                return InteractionType.Attach;
-
-            return InteractionType.None;
-        }
         
-        public static InteractionType CanInteractSecondary(List<InteractableType> inventory, List<InteractableType> world)
-        {
-            if (inventory.Contains(InteractableType.Useable) && world.Count == 0)
-                return InteractionType.Use;
 
-            if (inventory.Count == 0 && world.Contains(InteractableType.Activatable))
-                return InteractionType.Activate;
-
-            if (inventory.Contains(InteractableType.Appliable) && world.Contains(InteractableType.Receiving))
-                return InteractionType.Apply;
-            
-            return InteractionType.None;
-        }
     }
 
     public enum InteractionCategory
@@ -46,16 +18,6 @@ namespace InteractionSystem
         Tetriary        // reserved for a third button. May be contextual
     }
     
-    public enum InteractionType
-    {
-        None,
-        Pickup,
-        Drop,
-        Attach,
-        Use,
-        Activate,
-        Apply
-    }
 
     public enum InteractionTargeting
     {
@@ -64,18 +26,53 @@ namespace InteractionSystem
         Vicinity
     }
     
-    public enum InteractableType
+    public class InteractionSet
     {
-        None,
-        Attachable,
-        Socket,
-        Pickupable,
-        Dropable,
-        Useable,
-        Activatable,
-        Appliable,
-        Receiving,
-        Damaging,
-        Damageable
+        public InteractionSet()
+        {
+            Interactions = new Dictionary<InteractionCategory, InteractionContext>();
+            
+            foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
+            {
+                Interactions[category] = new InteractionContext();
+            }
+        }
+
+        public Dictionary<InteractionCategory, InteractionContext> Interactions;
+    }
+    
+    public struct InteractionProspect
+    {
+        public InteractionProspect(Interaction interaction, IInteractable hand = null, 
+            IInteractable world = null)
+        {
+            Interaction = interaction;
+            HandInteractable = hand;
+            WorldInteractable = world;
+        }
+        
+        public Interaction Interaction;
+        public IInteractable HandInteractable;
+        public IInteractable WorldInteractable;
+    }
+    
+    public struct InteractionContext
+    {
+        public InteractionContext(IInteractor interactor, Interaction interaction, 
+            IInteractable hand = null, IInteractable world = null, 
+            RaycastHit hit = new RaycastHit())
+        {
+            Interactor = interactor;
+            Interaction = interaction;
+            HandInteractable = hand;
+            WorldInteractable = world;
+            Hit = hit;
+        }
+
+        public Interaction Interaction;
+        public IInteractor Interactor;
+        public IInteractable HandInteractable;
+        public IInteractable WorldInteractable;
+        public RaycastHit Hit;
     }
 }
