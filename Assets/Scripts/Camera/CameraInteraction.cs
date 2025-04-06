@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using InventorySystem;using UnityEngine;
 using InteractionSystem;
 
-public class CameraInteraction : MonoBehaviour,  IInventoryItem, IInteractable, IPickupable, IDropable, IActivatable
+public class CameraInteraction : MonoBehaviour,  IInventoryItem, IInteractable
 {
     [SerializeField] private string _name;
     [SerializeField] private Sprite _sprite;
@@ -31,13 +31,6 @@ public class CameraInteraction : MonoBehaviour,  IInventoryItem, IInteractable, 
     public List<Interaction> GetInteractions()
     {
         return _interactions;
-    }
-
-    public void Activate(InteractionContext context)
-    {
-        if (!AdjustmentActive) _angleAdjuster.Activate();
-        else _angleAdjuster.Deactivate();
-        AdjustmentActive = !AdjustmentActive;
     }
 
     public Sprite GetIcon()
