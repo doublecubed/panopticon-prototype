@@ -392,6 +392,19 @@ namespace InteractionSystem
                 }
 
                 InteractionSets[interactor] = interactionSet;
+                
+                
+                string outputText = "";
+                foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
+                {
+                    if (InteractionSets[interactor].Interactions[category].Interaction == null) continue;
+                    outputText += category + ":\n";
+                    outputText += "Interaction: " + InteractionSets[interactor].Interactions[category].Interaction.Name +"\n";
+                    outputText += "Hand: " + InteractionSets[interactor].Interactions[category].HandInteractable + "\n";
+                    outputText += "World: " + InteractionSets[interactor].Interactions[category].WorldInteractable + "\n";
+                }
+                
+                OutputText.text = outputText;
             }
         }
 
