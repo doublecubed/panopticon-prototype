@@ -30,15 +30,15 @@ namespace InteractionSystem
     {
         public InteractionSet()
         {
-            Interactions = new Dictionary<InteractionCategory, InteractionContext>();
+            InteractionContexts = new Dictionary<InteractionCategory, InteractionContext>();
             
             foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
             {
-                Interactions[category] = new InteractionContext();
+                InteractionContexts[category] = new InteractionContext();
             }
         }
 
-        public Dictionary<InteractionCategory, InteractionContext> Interactions;
+        public Dictionary<InteractionCategory, InteractionContext> InteractionContexts;
     }
     
     public struct InteractionProspect

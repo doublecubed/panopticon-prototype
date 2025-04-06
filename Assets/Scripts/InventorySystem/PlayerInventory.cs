@@ -85,6 +85,11 @@ namespace InventorySystem
             CarryObjects[slot] = carry;
         }
 
+        public void AddCarryObject(GameObject carry)
+        {
+            AddCarryObject(carry, CurrentInventoryIndex);
+        }
+        
         public void RemoveCarryObject(int slot)
         {
             if (!IsValidSlot(slot)) return;

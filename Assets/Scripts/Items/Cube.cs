@@ -23,7 +23,7 @@ public class Cube : MonoBehaviour, IInventoryItem, IReceiver
 
     public void Interact(InteractionContext context)
     {
-        Debug.Log("Interacted");
+        
     }
 
     public bool CanInteractWith(Interaction interaction, IInteractable interactable)

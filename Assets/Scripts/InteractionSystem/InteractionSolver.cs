@@ -300,7 +300,7 @@ namespace InteractionSystem
                     {
                         Interaction interaction = prospectList[i].Interaction;
 
-                        interactionSet.Interactions[category] = new InteractionContext();
+                        interactionSet.InteractionContexts[category] = new InteractionContext();
                         
                         switch (interaction.Targeting)
                         {
@@ -311,7 +311,7 @@ namespace InteractionSystem
                                         interaction,
                                         prospectList[i].HandInteractable, prospectList[i].WorldInteractable,
                                         raycastHit);
-                                    interactionSet.Interactions[category] = raycastContext;
+                                    interactionSet.InteractionContexts[category] = raycastContext;
                                 }
                                 break;
                             case InteractionTargeting.Spherecast:
@@ -321,14 +321,14 @@ namespace InteractionSystem
                                         interaction,
                                         prospectList[i].HandInteractable, prospectList[i].WorldInteractable,
                                         spherecastHit);
-                                    interactionSet.Interactions[category] = spherecastContext;
+                                    interactionSet.InteractionContexts[category] = spherecastContext;
                                 }
                                 break;
                             case InteractionTargeting.Vicinity:
                                 InteractionContext categoryContext = new InteractionContext(interactor,
                                     interaction,
                                     prospectList[i].HandInteractable, prospectList[i].WorldInteractable);
-                                interactionSet.Interactions[category] = categoryContext;
+                                interactionSet.InteractionContexts[category] = categoryContext;
                                 break;
                         }
                     }
@@ -340,9 +340,9 @@ namespace InteractionSystem
                 foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
                 {
                     outputText += category + ":\n";
-                    outputText += "Interaction: " + InteractionSets[interactor].Interactions[category].Interaction.Name +"\n";
-                    outputText += "Hand: " + InteractionSets[interactor].Interactions[category].HandInteractable + "\n";
-                    outputText += "World: " + InteractionSets[interactor].Interactions[category].WorldInteractable + "\n";
+                    outputText += "Interaction: " + InteractionSets[interactor].InteractionContexts[category].Interaction.Name +"\n";
+                    outputText += "Hand: " + InteractionSets[interactor].InteractionContexts[category].HandInteractable + "\n";
+                    outputText += "World: " + InteractionSets[interactor].InteractionContexts[category].WorldInteractable + "\n";
                 }
                 
                 OutputText.text = outputText;
@@ -374,7 +374,7 @@ namespace InteractionSystem
                                     new InteractionContext(interactor, prospectInteraction,
                                         categoryProspects[i].HandInteractable, categoryProspects[i].WorldInteractable,
                                         castResult);
-                                interactionSet.Interactions[category] = castContext;
+                                interactionSet.InteractionContexts[category] = castContext;
                                 foundValidInteraction = true;
                             }
                         }
@@ -383,7 +383,7 @@ namespace InteractionSystem
                             InteractionContext vicinityContext =
                                 new InteractionContext(interactor, prospectInteraction,
                                     categoryProspects[i].HandInteractable, categoryProspects[i].WorldInteractable);
-                            interactionSet.Interactions[category] = vicinityContext;
+                            interactionSet.InteractionContexts[category] = vicinityContext;
                             foundValidInteraction = true;
                         }
 
@@ -397,11 +397,11 @@ namespace InteractionSystem
                 string outputText = "";
                 foreach (InteractionCategory category in Enum.GetValues(typeof(InteractionCategory)))
                 {
-                    if (InteractionSets[interactor].Interactions[category].Interaction == null) continue;
+                    if (InteractionSets[interactor].InteractionContexts[category].Interaction == null) continue;
                     outputText += category + ":\n";
-                    outputText += "Interaction: " + InteractionSets[interactor].Interactions[category].Interaction.Name +"\n";
-                    outputText += "Hand: " + InteractionSets[interactor].Interactions[category].HandInteractable + "\n";
-                    outputText += "World: " + InteractionSets[interactor].Interactions[category].WorldInteractable + "\n";
+                    outputText += "Interaction: " + InteractionSets[interactor].InteractionContexts[category].Interaction.Name +"\n";
+                    outputText += "Hand: " + InteractionSets[interactor].InteractionContexts[category].HandInteractable + "\n";
+                    outputText += "World: " + InteractionSets[interactor].InteractionContexts[category].WorldInteractable + "\n";
                 }
                 
                 OutputText.text = outputText;
